@@ -74,5 +74,12 @@ for params_file in params_files:
         pipeline = OneSplitPipeline( data_params = params.data,  model_params = params.models, pre_params = params.pre, feature_params = params.features, pipeline_params=params.pipeline, exp_name = log_dir)
     elif params.pipeline['type'] == 'crossvalidation':
         pipeline = CrossvalidationPipeline( data_params = params.data,  model_params = params.models, pre_params = params.pre, feature_params = params.features, pipeline_params=params.pipeline, exp_name = log_dir)
+
+    import timeit
+
+    start = timeit.default_timer()
     pipeline.run()
+    stop = timeit.default_timer()
+
+    logging.info('Running Time: ', stop - start)
 
