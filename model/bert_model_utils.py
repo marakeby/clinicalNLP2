@@ -6,7 +6,7 @@ from transformers import BertModel, PreTrainedModel, BertConfig, load_tf_weights
 from transformers.modeling_outputs import Seq2SeqSequenceClassifierOutput, SequenceClassifierOutput
 
 class TorchDataset(torch.utils.data.Dataset):
-`    def __init__(self, encodings, labels):
+    def __init__(self, encodings, labels):
         self.encodings = encodings
         self.labels = labels
 
