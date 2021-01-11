@@ -40,11 +40,17 @@ params_files = []
 # params_files.append('./params/bert/any_cancer_one_split_seq_IMPRESS')
 # params_files.append('./params/bert/any_cancer_one_split_BERT_IMPRESS')
 # params_files.append('./params/bert/any_cancer_one_split_BERT_IMPRESS_NARR')
-params_files.append('./params/bert/any_cancer_one_split_BERT_IMPRESS_NARR')
+# params_files.append('./params/bert/any_cancer_one_split_BERT_IMPRESS_NARR')
+# params_files.append('./params/bert/any_cancer_one_split_BERT_rnn')
+# params_files.append('./params/bert/any_cancer_one_split_BERT_cnn')
+# params_files.append('./params/bert/any_cancer_one_split_BERT_cnn_tiny')
+# params_files.append('./params/bert/any_cancer_one_split_BERT_linear_tiny')
+# params_files.append('./params/bert/any_cancer_one_split_BERT_cnn_sizes_tiny')
+params_files.append('./params/torch_cnn/any_cancer_torch_cnn')
+# params_files.append('./params/torch_cnn/any_cancer_torch_cnn2d')
 # params_files.append('./params/preprocss/any_cancer_one_split_seq_clean')
 # params_files.append('./params/preprocss/any_cancer_one_split_seq_original')
 # params_files.append('./params/manual_labels/response_one_split_tfidf')
-
 
 # params_files.append('./params/manual_labels/any_cancer_crossvalidation_seq')
 
@@ -59,6 +65,12 @@ params_files.append('./params/bert/any_cancer_one_split_BERT_IMPRESS_NARR')
 # params_files.append('./params/manual_labels/progression_one_split_seq')
 # params_files.append('./params/manual_labels/progression_crossvalidation_seq')
 # params_files.append('./params/manual_labels/progression_crossvalidation_tfidf')
+
+def elapsed_time(start_time, end_time):
+    elapsed_time = end_time - start_time
+    elapsed_mins = int(elapsed_time / 60)
+    elapsed_secs = int(elapsed_time - (elapsed_mins * 60))
+    return elapsed_mins, elapsed_secs
 
 for params_file in params_files:
     timeStamp = '_{0:%b}-{0:%d}_{0:%H}-{0:%M}'.format(datetime.datetime.now())
@@ -80,6 +92,5 @@ for params_file in params_files:
     start = timeit.default_timer()
     pipeline.run()
     stop = timeit.default_timer()
-
-    logging.info('Running Time: ', stop - start)
-
+    mins, secs= elapsed_time(start, stop)
+    logging.info(f'Epoch Time: {mins}m {secs}s')
