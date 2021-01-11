@@ -20,7 +20,7 @@ class BERTTokenizer():
 
         ret = self.tokenizer(list(x), truncation=self.truncation, padding=self.padding, max_length= self.max_length)
         print('type ret',type(ret))
-        print(ret[100])
+        # print(ret[100])
         print(len(ret))
 
         return ret

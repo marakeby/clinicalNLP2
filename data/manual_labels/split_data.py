@@ -4,7 +4,7 @@ import numpy as np
 from os.path import join, dirname
 
 dir_path = dirname(dirname(__file__))
-
+dir_path = dir_path.replace('clinicalNLP2', 'clinicalNLP')
 input_dir = join(dir_path, 'medical_notes/input/radiology_impressions_derived_data')
 
 filename = join(input_dir, 'manual_label_analysis.csv')
@@ -17,6 +17,7 @@ label_analysis['imaging_text'] = label_analysis.imaging_text.str.replace(r'\r\n'
 label_analysis = label_analysis.drop_duplicates(subset='imaging_text')
 label_analysis = label_analysis[label_analysis['imaging_text'].str.contains("it has been imported") == False]
 print(label_analysis.info())
+
 
 
 

@@ -3,6 +3,7 @@ import pandas as pd
 from os.path import dirname, join
 import numpy as np
 import gcsfs
+
 fs = gcsfs.GCSFileSystem(project='profile-notes')
 
 input_dir = 'radiology-impressions-derived-data'
