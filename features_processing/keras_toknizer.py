@@ -19,9 +19,10 @@ class KerasTokenizer():
         if self.mode =='seq':
             ret= self.tokenizer.texts_to_sequences(x)
             ret = sequence.pad_sequences(ret, maxlen=self.pad_length)
-            print (len(ret[0]))
-            print (ret[0])
-            print (ret.shape)
+            print('seq keras tokenizer')
+            # print (len(ret[0]))
+            # print (ret[0])
+            # print (ret.shape)
             return ret
 
         return self.tokenizer.texts_to_matrix(x, mode = self.mode)

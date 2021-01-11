@@ -105,7 +105,9 @@ class Model(BaseEstimator):
         else:
             validation_data = []
 
+        logging.info(self.model.summary())
         history = self.model.fit(X_train, y_train, epochs=self.nb_epoch, batch_size=self.batch_size, verbose=self.verbose, validation_data=validation_data, callbacks=callbacks, shuffle=self.shuffle)
+
 
         weights= self.model.layers[1].get_weights()
         # print 'weights', len(weights)

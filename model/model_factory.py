@@ -17,13 +17,14 @@ from model import nn
 # the params is in the format of {'type': 'model_type', 'params' {}}
 # an example is params = {'type': 'svr', 'parmas': {'C': 0.025} }
 from model.bert_torch_model import Bert_Torch_Model
+from model.nn_torch import TorchModel
 
 
 def construct_model(model_params_dict):
     model_type = model_params_dict['type']
     p = model_params_dict['params']
     # logging.info ('model type: ', str(model_type))
-    logging.info('model paramters: '.format( p))
+    logging.info('model paramters: {}'.format( p))
 
     if model_type == 'svr':
         model = svm.SVR(max_iter=5000, **p)
@@ -107,6 +108,9 @@ def construct_model(model_params_dict):
 
     elif model_type == 'nn':
         model = nn.Model(**p)
+
+    elif model_type=='nn_torch':
+        model = TorchModel(**p)
 
     elif model_type=='bert':
         model = Bert_Torch_Model(**p)
