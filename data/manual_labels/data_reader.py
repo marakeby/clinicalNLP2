@@ -8,19 +8,40 @@ from config_path import DATA_PATH
 dir_path = dirname(dirname(__file__))
 import logging
 
-# processed_dir = join(dir_path, 'manual_labels/processed/')
-# input_dir = join(dir_path, 'medical_notes/input/derived_data')
-# input_dir = join(dir_path, 'medical_notes/input/radiology_impressions_derived_data')
-input_dir = join(DATA_PATH, 'manual_labels/input')
-processed_dir = join(dir_path, 'manual_labels/processed')
-class ManualLabels():
-    def __init__(self, outcome = 'any_cancer', text = 'NARR+IMPRESS', training_split=0):
 
-        #which dataset to use for training {0: original training, 1, 2, 3..: decreasing sizes of training splits}
+def read_file_gc(filename, fs):
+    with fs.open(filename) as f:
+        label_analysis = pd.read_csv(f)
+    return label_analysis
+
+processed_dir = join(dir_path, 'manual_labels/processed')
+
+class ManualLabels():
+    def __init__(self, outcome = 'any_cancer', text = 'NARR+IMPRESS', training_split=0, cloud=False):
 
         self.training_split = training_split
-        filename= join(input_dir, 'manual_label_analysis.csv')
-        label_analysis = pd.read_csv(filename)
+        self.training_file= 'training_mrns_{}.csv'.format(self.training_split)
+        #which dataset to use for training {0: original training, 1, 2, 3..: decreasing sizes of training splits}
+        if cloud:
+            import gcsfs
+            fs = gcsfs.GCSFileSystem(project='profile-notes')
+            input_dir = 'radiology-impressions-derived-data'
+            # get training and validation patients
+            label_analysis = read_file_gc(join(input_dir, 'manual_label_analysis.csv'), fs)
+            self.validation_mrns = read_file_gc(join(input_dir, 'validation_mrns.csv'), fs)
+            self.testing_mrns = read_file_gc(join(input_dir, 'truetest_mrns.csv'), fs)
+            self.training_mrns = read_file_gc(join(input_dir, self.training_file), fs)
+            
+        else:
+            input_dir = join(DATA_PATH, 'manual_labels/input')
+            filename= join(input_dir, 'manual_label_analysis.csv')
+            label_analysis = pd.read_csv(filename)
+
+            # get training and validation patients
+            self.training_mrns = pd.read_csv(join(processed_dir, self.training_file))
+            self.validation_mrns = pd.read_csv(join(input_dir, 'validation_mrns.csv'))
+            self.testing_mrns = pd.read_csv(join(input_dir, 'truetest_mrns.csv'))
+
 
         # combine NARR_TXT and IMPRESS_TXT and get rid of carriage returns
 
@@ -68,16 +89,10 @@ class ManualLabels():
         x = self.x
         y = self.y
         columns = self.columns
-        # get training and validation patients
-        training_file= 'training_mrns_{}.csv'.format(self.training_split)
-        training_mrns = pd.read_csv(join(processed_dir, training_file))
 
-        validation_mrns = pd.read_csv(join(input_dir, 'validation_mrns.csv'))
-        testing_mrns = pd.read_csv(join(input_dir, 'truetest_mrns.csv'))
-
-        ind_train = info['DFCI_MRN'].isin(training_mrns.DFCI_MRN)
-        ind_validate = info['DFCI_MRN'].isin(validation_mrns.DFCI_MRN)
-        ind_test = info['DFCI_MRN'].isin(testing_mrns.DFCI_MRN)
+        ind_train = info['DFCI_MRN'].isin(self.training_mrns.DFCI_MRN)
+        ind_validate = info['DFCI_MRN'].isin(self.validation_mrns.DFCI_MRN)
+        ind_test = info['DFCI_MRN'].isin(self.testing_mrns.DFCI_MRN)
 
         x_train = x[ind_train]
         x_test = x[ind_test]
