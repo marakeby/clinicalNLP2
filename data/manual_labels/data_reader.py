@@ -17,7 +17,7 @@ def read_file_gc(filename, fs):
 processed_dir = join(dir_path, 'manual_labels/processed')
 
 class ManualLabels():
-    def __init__(self, outcome = 'any_cancer', text = 'NARR+IMPRESS', training_split=0, cloud=False):
+    def __init__(self, outcome = 'any_cancer', text = 'NARR+IMPRESS', training_split=0, cloud=True):
 
         self.training_split = training_split
         self.training_file= 'training_mrns_{}.csv'.format(self.training_split)
@@ -30,7 +30,7 @@ class ManualLabels():
             label_analysis = read_file_gc(join(input_dir, 'manual_label_analysis.csv'), fs)
             self.validation_mrns = read_file_gc(join(input_dir, 'validation_mrns.csv'), fs)
             self.testing_mrns = read_file_gc(join(input_dir, 'truetest_mrns.csv'), fs)
-            self.training_mrns = read_file_gc(join(input_dir, self.training_file), fs)
+            self.training_mrns = pd.read_csv(join(processed_dir, self.training_file))
             
         else:
             input_dir = join(DATA_PATH, 'manual_labels/input')
@@ -61,7 +61,9 @@ class ManualLabels():
         label_analysis = label_analysis.drop_duplicates(subset='imaging_text')
 
         # drop outside scans
-        label_analysis = label_analysis.query('imaging_text.str.contains("it has been imported") == False')
+#         label_analysis = label_analysis.query('imaging_text.str.contains("it has been imported") == False')
+        ind = label_analysis.imaging_text.str.contains('it has been imported')
+        label_analysis = label_analysis[~ind]
         # logging.info(label_analysis.info())
 
         x = label_analysis
