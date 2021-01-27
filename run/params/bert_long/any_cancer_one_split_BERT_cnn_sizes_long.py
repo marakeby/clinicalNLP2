@@ -6,6 +6,7 @@ from os.path import join
 from model.torch_models.bert_cnn import CNN_Over_BERT
 
 training_splits = [0,1,4,6,7,9]
+# training_splits = [9]
 number_reports = [11182,7382,2897,1214, 865, 453 ]
 number_patients= [884,592,214,103,68, 35 ]
 
@@ -42,8 +43,8 @@ training_args = TrainingArguments(
         output_dir=join('/home/haithamelmarakeby/results',filename),  # output directory
         num_train_epochs=5,  # total number of training epochs
         # per_device_train_batch_size=16,  # batch size per device during training
-        per_device_train_batch_size=8,  # batch size per device during training
-        per_device_eval_batch_size=8,  # batch size for evaluation
+        per_device_train_batch_size=4,  # batch size per device during training
+        per_device_eval_batch_size=4,  # batch size for evaluation
         warmup_steps=500,  # number of warmup steps for learning rate scheduler
         weight_decay=0.01,  # strength of weight decay
         logging_dir=join('/home/haithamelmarakeby/logs',filename),  # directory for storing logs
@@ -54,8 +55,8 @@ training_args = TrainingArguments(
 
 classifier_params = dict(nhid=120, output_dim=2, nfilters=120, filter_sizes=[3,5], dropout=0.2)
 
-bert_model_name= 'google/bert_uncased_L-12_H-768_A-12'
-
+# bert_model_name= 'google/bert_uncased_L-12_H-768_A-12'
+bert_model_name= 'allenai/longformer-base-4096'
 bert= {
     'type': 'bert',
     'id': 'BERT',
@@ -66,7 +67,7 @@ bert= {
                    training_args=training_args)
 }
 
-max_length = 512
+max_length = 1024
 
 features = { 'type' : 'bert_tokenizer', 'parmas': dict(model_name= bert_model_name, truncation= True, padding=True, max_length= max_length)}
 # features = { 'type' : 'bert_tokenizer', 'parmas': {'model_name': bert_model_name, 'truncation': True, 'padding': True}}

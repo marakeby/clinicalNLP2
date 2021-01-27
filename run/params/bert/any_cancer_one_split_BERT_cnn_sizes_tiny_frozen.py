@@ -11,7 +11,7 @@ number_patients= [884,592,214,103,68, 35 ]
 
 
 filename = os.path.basename(__file__)
-d_base = dict(id='any_cancer',
+d_base = dict(id='any_cancer_IMPRESS',
               type= 'manual_label',
               params = {
                         'outcome': 'any_cancer',
@@ -40,27 +40,26 @@ pre = dict(type= 'clean_text',
 
 training_args = TrainingArguments(
         output_dir=join('/home/haithamelmarakeby/results',filename),  # output directory
-        num_train_epochs=5,  # total number of training epochs
+        num_train_epochs=20,  # total number of training epochs
         # per_device_train_batch_size=16,  # batch size per device during training
-        per_device_train_batch_size=8,  # batch size per device during training
-        per_device_eval_batch_size=8,  # batch size for evaluation
+        per_device_train_batch_size=64,  # batch size per device during training
+        per_device_eval_batch_size=64,  # batch size for evaluation
         warmup_steps=500,  # number of warmup steps for learning rate scheduler
         weight_decay=0.01,  # strength of weight decay
         logging_dir=join('/home/haithamelmarakeby/logs',filename),  # directory for storing logs
-        logging_steps=500,
-        save_steps=2000
+        logging_steps=10,
     )
 
 
 classifier_params = dict(nhid=120, output_dim=2, nfilters=120, filter_sizes=[3,5], dropout=0.2)
 
-bert_model_name= 'google/bert_uncased_L-12_H-768_A-12'
+bert_model_name= 'google/bert_uncased_L-2_H-128_A-2'
 
 bert= {
     'type': 'bert',
     'id': 'BERT',
     'params': dict(bert_model_name=bert_model_name,
-                   freez_bert=False,
+                   freez_bert=True,
                    classifier=CNN_Over_BERT,
                    classifier_params=classifier_params,
                    training_args=training_args)

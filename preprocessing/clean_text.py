@@ -7,8 +7,9 @@ import logging
 from sklearn.base import BaseEstimator
 
 
-def preprocess_text(sen, remove_tag=True, remove_special_chars=True, remove_numbers=False, remove_single_chars=True, remove_multiple_sapces=True):
+def preprocess_text(sen, lower=True, remove_tag=True, remove_special_chars=True, remove_numbers=False, remove_single_chars=True, remove_multiple_sapces=True):
     sentence =copy(sen)
+    sentence=sentence.lower()
     # Removing html tags
     if remove_tag:
         sentence = remove_tags(sen)

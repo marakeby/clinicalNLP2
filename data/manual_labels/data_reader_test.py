@@ -1,7 +1,7 @@
 from data.manual_labels.data_reader import ManualLabels
 
 # data = ManualLabels(outcome = 'any_cancer', text='IMPRESS')
-data =[{'id':'any_cancer_IMPRESS','type': 'manual_label' , 'params': {'outcome': 'any_cancer', 'text': 'NARR+IMPRESS', 'training_split':0}}]
+data =[{'id':'any_cancer_IMPRESS','type': 'manual_label' , 'params': {'outcome': 'any_cancer', 'text': 'NARR+IMPRESS', 'training_split':9}}]
 
 # data = ManualLabels(outcome = 'any_cancer')
 data = ManualLabels(**data[0]['params'])
