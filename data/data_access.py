@@ -1,6 +1,7 @@
 import logging
 
 from data.manual_labels.data_reader import ManualLabels
+from data.updated_labels.data_reader import UpdatedLabels
 # from data.medical_notes.data_reader import ClinicalData
 import pandas as pd
 import numpy as np
@@ -14,6 +15,8 @@ class Data():
             self.data_reader = ClinicalData(**params)
         if self.data_type == 'manual_label':
             self.data_reader = ManualLabels(**params)
+        elif self.data_type == 'updated_label':
+            self.data_reader = UpdatedLabels(**params)
         else:
             logging.error('unsupported data type')
             raise ValueError('unsupported data type')

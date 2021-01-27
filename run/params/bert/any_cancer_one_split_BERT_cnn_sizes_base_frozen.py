@@ -60,7 +60,7 @@ bert= {
     'type': 'bert',
     'id': 'BERT',
     'params': dict(bert_model_name=bert_model_name,
-                   freez_bert=False,
+                   freez_bert=True,
                    classifier=CNN_Over_BERT,
                    classifier_params=classifier_params,
                    training_args=training_args)

@@ -5,18 +5,19 @@ import numpy as np
 
 from config_path import DATA_PATH
 
-dir_path = dirname(dirname(__file__))
+# dir_path = dirname(dirname(__file__))
 import logging
 
 
 def read_file_gc(filename, fs):
+    print(filename)
     with fs.open(filename) as f:
         label_analysis = pd.read_csv(f)
     return label_analysis
 
-processed_dir = join(dir_path, 'manual_labels/processed')
+processed_dir = join(DATA_PATH, 'manual_labels/processed')
 
-class ManualLabels():
+class UpdatedLabels():
     def __init__(self, outcome = 'any_cancer', text = 'NARR+IMPRESS', training_split=0, cloud=True):
 
         self.training_split = training_split
@@ -26,16 +27,17 @@ class ManualLabels():
             import gcsfs
             fs = gcsfs.GCSFileSystem(project='profile-notes')
             input_dir = 'radiology-impressions-derived-data'
+            updated_labels_filename = 'gs://profile-notes/geekfest_files/labeled_imaging_reports_manual_dedup_10-8-19.feather'
             # get training and validation patients
-            label_analysis = read_file_gc(join(input_dir, 'manual_label_analysis.csv'), fs)
+            label_analysis = pd.read_feather(updated_labels_filename)
             self.validation_mrns = read_file_gc(join(input_dir, 'validation_mrns.csv'), fs)
             self.testing_mrns = read_file_gc(join(input_dir, 'truetest_mrns.csv'), fs)
             self.training_mrns = pd.read_csv(join(processed_dir, self.training_file))
             
         else:
-            input_dir = join(DATA_PATH, 'manual_labels/input')
-            filename= join(input_dir, 'manual_label_analysis.csv')
-            label_analysis = pd.read_csv(filename)
+            input_dir = join(DATA_PATH, 'updated_labels/input')
+            filename= join(input_dir, 'geekfest_labeled_imaging_reports_manual_dedup_10-8-19.feather.txt')
+            label_analysis = pd.read_feather(filename)
 
             # get training and validation patients
             self.training_mrns = pd.read_csv(join(processed_dir, self.training_file))
@@ -44,7 +46,7 @@ class ManualLabels():
 
 
         # combine NARR_TXT and IMPRESS_TXT and get rid of carriage returns
-        
+
         # label_analysis = label_analysis.assign(imaging_text=label_analysis.NARR_TXT + ' ' + label_analysis.IMPRESS_TXT)
         if text=='NARR+IMPRESS':
             label_analysis = label_analysis.assign(imaging_text=label_analysis.NARR_TXT + ' ' + label_analysis.IMPRESS_TXT)
@@ -56,6 +58,7 @@ class ManualLabels():
         label_analysis['imaging_text'] = label_analysis.imaging_text.str.replace(r'\r\n', ' ')
         label_analysis['imaging_text'] = label_analysis.imaging_text.str.replace(r'\r', ' ')
         label_analysis['imaging_text'] = label_analysis.imaging_text.str.replace(r'\n', ' ')
+
         print ('label_analysis shape {}'.format(label_analysis.shape))
         # drop duplicate reports
         label_analysis = label_analysis.drop_duplicates(subset='imaging_text')
@@ -64,8 +67,8 @@ class ManualLabels():
 #         label_analysis = label_analysis.query('imaging_text.str.contains("it has been imported") == False')
         ind = label_analysis.imaging_text.str.contains('it has been imported')
         label_analysis = label_analysis[~ind]
-        # logging.info(label_analysis.info())
         print ('label_analysis shape adter removing imported {}'.format(label_analysis.shape))
+        # logging.info(label_analysis.info())
 
         x = label_analysis
         x = x.assign(response=np.where(x.redcap_resp_prog == 1, 1, 0))
@@ -74,11 +77,11 @@ class ManualLabels():
         info = x[['DFCI_MRN', 'ehr_scan_date', 'PROC_DESCR']]
 
         if outcome =='any_cancer':
-            y = x['any_cancer'].copy()
+            y = x['any_cancer'].map(np.int).copy()
         elif outcome =='response':
-            y = x['response'].copy()
+            y = x['response'].map(np.int).copy()
         elif outcome =='progression':
-            y = x['progression'].copy()
+            y = x['progression'].map(np.int).copy()
 
         self.x = x.imaging_text.values
         self.y = y.values

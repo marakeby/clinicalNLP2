@@ -4,7 +4,7 @@ from os.path import join
 from model.torch_models.bert_cnn import CNN_Over_BERT
 
 filename = os.path.basename(__file__)
-data =[{'id':'any_cancer_IMPRESS','type': 'manual_label' , 'params': {'outcome': 'any_cancer', 'text': 'NARR+IMPRESS','training_split':10}}]
+data =[{'id':'any_cancer_IMPRESS','type': 'manual_label' , 'params': {'outcome': 'any_cancer', 'text': 'NARR+IMPRESS','training_split':9}}]
 
 #preprocessing
 pre = dict(type= 'clean_text',
@@ -17,14 +17,14 @@ pre = dict(type= 'clean_text',
 
 
 training_args = TrainingArguments(
-        output_dir=join('./results',filename),  # output directory
-        num_train_epochs=1,  # total number of training epochs
+        output_dir=join('/home/haithamelmarakeby/results',filename),  # output directory
+        num_train_epochs=20,  # total number of training epochs
         # per_device_train_batch_size=16,  # batch size per device during training
         per_device_train_batch_size=64,  # batch size per device during training
         per_device_eval_batch_size=64,  # batch size for evaluation
         warmup_steps=500,  # number of warmup steps for learning rate scheduler
         weight_decay=0.01,  # strength of weight decay
-        logging_dir=join('./logs',filename),  # directory for storing logs
+        logging_dir=join('/home/haithamelmarakeby/logs',filename),  # directory for storing logs
         logging_steps=10,
     )
 
