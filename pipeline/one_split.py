@@ -127,77 +127,17 @@ class OneSplitPipeline:
             logging.info('preprocessing....')
             x_train, x_test = self.preprocess(x_train, x_test)
 
-            # feature extraction (tokenization)
             logging.info('feature extraction....')
-            #stupid workaround
-            # from features_processing.bert_tokenizer import BERTTokenizer
-            # proc = BERTTokenizer(**self.features_params['parmas'])
-            # proc.fit(x_train)
-            # x_train=proc.transform(x_train)
-            # x_validate=proc.transform(x_validate)
-            # x_test=proc.transform(x_test)
-
             x_train, x_validate, x_test = self.extract_features(x_train, x_validate, x_test)
 
-            # logging.info('x_trian {} x_validate {}  x_test{} '.format(x_train.shape,  x_validate.shape, x_test.shape))
-            # logging.info('y_trian {} y_validate {}  y_test{} '.format(y_train.shape,  y_validate.shape, y_test.shape))
 
             for m in self.model_params:
                 # get model
                 set_random_seeds(random_seed=20080808)
 
                 model = get_model(m)
-                #####
-                # from transformers import AutoModelForSequenceClassification
-                # bert_tiny = 'google/bert_uncased_L-2_H-128_A-2'
-                # model = AutoModelForSequenceClassification.from_pretrained(bert_tiny)
-                # logging.info('fitting {}'.format(m))
-
-                from transformers import Trainer
-                # def get_dataset(encodings, labels, type='tf'):
-                #     if type == 'tf':
-                #         dic = (encodings, labels)  # not tested
-                #         return tf.data.Dataset.from_tensor_slices(dic)
-                #     else:
-                #         # from model.bert_model_utils import TorchDataset
-                #         from model.bert_model_utils import TorchDataset
-                #         return TorchDataset(encodings, labels)
-
-                # from transformers import TrainingArguments
-                # training_args = TrainingArguments(
-                #     output_dir='./results',  # output directory
-                #     num_train_epochs=3,  # total number of training epochs
-                #     per_device_train_batch_size=16,  # batch size per device during training
-                #     per_device_eval_batch_size=64,  # batch size for evaluation
-                #     warmup_steps=500,  # number of warmup steps for learning rate scheduler
-                #     weight_decay=0.01,  # strength of weight decay
-                #     logging_dir='./logs',  # directory for storing logs
-                #     logging_steps=10,
-                # )
-                #
-                # train_dataset = get_dataset(x_train, y_train, type='torch')
-                # val_dataset = get_dataset(x_validate, y_validate, type='torch')
-
-                # trainer = Trainer(
-                #     model=model,  # the instantiated 🤗 Transformers model to be trained
-                #     args=training_args,  # training arguments, defined above
-                #     train_dataset=train_dataset,  # training dataset
-                #     eval_dataset=val_dataset  # evaluation dataset
-                # )
-
-                # for name, param in model.named_parameters():
-                #     print(name)
-                #     if 'classifier' not in name:  # classifier layer
-                #         param.requires_grad = False
-
-                # trainer.train()
-                # train_predictions = trainer.predict(train_dataset)
-                # print(train_predictions.predictions.argmax(axis=1).shape)
-
-                #####
-                # model = model.fit(x_train, y_train, x_test, y_test)
-                model = model.fit(x_train, y_train)
-
+                                
+                model = model.fit(x_train, y_train, x_validate, y_validate)
 
                 logging.info('predicting')
                 if self.eval_dataset == 'validation':

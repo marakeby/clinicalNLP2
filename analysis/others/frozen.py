@@ -4,11 +4,20 @@ from os.path import join
 from matplotlib import pyplot as plt
 dirname  = os.path.dirname(__file__)
 
+dirname = join(dirname, 'gcp_results')
+dirname = join(dirname, 'frozen')
+
 cols= ['accuracy',	'percision',	'auc',	'f1',	'aupr',	'recall']
 cols_map=dict(accuracy='Accuracy', percision='Precision', auc='AUC', f1='F1',aupr='AUPRC', recall= 'Recall' )
-files= ['tiny_all_scores.csv', 'mini_all_scores.csv', 'med_all_scores.csv']
-number_patients= [884,592,214,103,68, 35 ]
-legend=['Tiny BERT', 'Mini BERT', 'Med BERT']
+# files= ['tiny_all_scores.csv', 'mini_all_scores.csv', 'med_all_scores.csv', 'base_all_scores.csv', 'long_all_scores.csv']
+files=['any_cancer_one_split_BERT_cnn_sizes_tiny_frozen_Jan-17_07-36.csv',
+'any_cancer_one_split_BERT_cnn_sizes_mini_frozen_Jan-17_07-45.csv',
+'any_cancer_one_split_BERT_cnn_sizes_med_frozen_Jan-17_08-12.csv',
+'any_cancer_one_split_BERT_cnn_sizes_base_frozen_Jan-17_10-27.csv']
+
+number_patients= [884,592,214,103,68, 35]
+# legend=['Tiny BERT', 'Mini BERT', 'Med BERT', 'Base BERT' , 'Longformer']
+legend=['Tiny BERT', 'Mini BERT', 'Med BERT', 'Base BERT' ]
 
 dfs=[]
 for f in files:

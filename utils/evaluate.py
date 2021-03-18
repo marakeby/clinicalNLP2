@@ -14,17 +14,17 @@ def evalualte(y_test, y_pred, y_pred_score =None):
     auc = metrics.auc(fpr, tpr)
     # auc2 = metrics.roc_auc_score(y_test, y_pred_score)
     f1 = metrics.f1_score(y_test, y_pred)
-    percision = metrics.precision_score(y_test, y_pred)
+    precision = metrics.precision_score(y_test, y_pred)
     recall = metrics.recall_score(y_test, y_pred)
-    logging.info( metrics.classification_report(y_test, y_pred))
+    # logging.info( metrics.classification_report(y_test, y_pred))
     # print '--score: ', accuracy, 'percision: ', percision,'auc1: ', auc, 'f1: ', f1
     from sklearn.metrics import average_precision_score
     aupr = average_precision_score(y_test, y_pred_score)
-    logging.info( '--accuracy: {0:.2f} percision: {1:.2f} auc: {2:.2f} f1: {3:.2f} aupr {4:.2f}'.format(accuracy, percision, auc, f1, aupr) )
-    print ('--------------------------------------------')
+    # logging.info( '--accuracy: {0:.2f} percision: {1:.2f} auc: {2:.2f} f1: {3:.2f} aupr {4:.2f}'.format(accuracy, precision, auc, f1, aupr) )
+    # print ('--------------------------------------------')
     score = {}
     score['accuracy'] = accuracy
-    score['percision'] = percision
+    score['precision'] = precision
     score['auc'] = auc
     score['f1'] = f1
     score['aupr'] = aupr
