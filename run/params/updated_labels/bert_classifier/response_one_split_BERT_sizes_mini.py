@@ -13,10 +13,10 @@ number_patients= [884,592,214,103,68, 35 ]
 
 
 filename = os.path.basename(__file__)
-d_base = dict(id='any_cancer',
+d_base = dict(id='response',
               type= 'updated_label',
               params = {
-                        'outcome': 'any_cancer',
+                        'outcome': 'response',
                         'text': 'NARR+IMPRESS',
                         'training_split':0, 'cloud':True
               }
@@ -24,7 +24,7 @@ d_base = dict(id='any_cancer',
 data=[]
 for i in training_splits:
     d = deepcopy(d_base)
-    d['id'] = 'any_cancer_{}'.format(i)
+    d['id'] = 'response_{}'.format(i)
     d['params']['training_split'] = i
     print (d)
     data.append(d)
@@ -54,14 +54,14 @@ training_args = TrainingArguments(
 
 
 
-bert_model_name= 'google/bert_uncased_L-2_H-128_A-2'
-
+# bert_model_name= 'google/bert_uncased_L-2_H-128_A-2'
+bert_model_name= 'google/bert_uncased_L-4_H-256_A-4'
 
 classifier_params_cnn = dict(nhid=120, output_dim=2, nfilters=120, filter_sizes=[3,5], dropout=0.2)
 classifier_params_linear = dict(nhid=120, output_dim=2, dropout=0.2)
 classifier_params_rnn = dict(nhid=120,n_layers=1,  output_dim=2, bidirectional=True, dropout=0.2)
 
-bert_model_name= 'google/bert_uncased_L-2_H-128_A-2'
+
 
 bert_cnn = {
     'type': 'bert',
