@@ -1,7 +1,7 @@
 from keras.preprocessing.text import Tokenizer
 from keras.preprocessing import sequence
 import logging
-from transformers import BertTokenizer, AutoTokenizer
+from transformers import  AutoTokenizer
 
 
 class BERTTokenizer():

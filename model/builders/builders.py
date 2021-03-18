@@ -110,10 +110,10 @@ def build_full_network(optimizer, n_features, n_hids, dropouts, w_reg, activatio
                 wreg = l2(w_reg[i])
 
             if i == 0:
-                layer = Dense(n, input_shape=(n_features,), activation=activation, W_regularizer=wreg,
+                layer = Dense(n, input_shape=(n_features,), activation=activation, kernel_regularizer=wreg,
                               name='h' + str(i))
             else:
-                layer = Dense(n, activation=activation, W_regularizer=l1(w_reg[i]), name='h' + str(i))
+                layer = Dense(n, activation=activation, kernel_regularizer=l1(w_reg[i]), name='h' + str(i))
 
             layers.append(layer)
             drop = dropouts[i]
@@ -123,7 +123,7 @@ def build_full_network(optimizer, n_features, n_hids, dropouts, w_reg, activatio
         output_layer = Dense(1, activation='sigmoid')
         outs = output_layer(merged)
 
-        model = Model(input=[ins], output=[outs])
+        model = Model(ins, outs)
 
         model.compile(optimizer=optimizer, loss='binary_crossentropy', metrics=['accuracy'])
         logging.info('done compiling')
