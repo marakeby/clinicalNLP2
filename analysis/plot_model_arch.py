@@ -194,30 +194,6 @@ def plot_compare_domain_adaptation(task = 'response'):
     plt.savefig(filename, dpi=400)
     plt.close()
 
-# def plot_compare_seq_length():
-#     title = 'Compare Sequnce length Arch. (Original BERT)'
-#     models = ['BERT', 'clinical BERT', 'longformer', 'JAMA', 'tfidf']
-#     model_mapping= { 'BERT':'BERT (original)',  'tfidf': 'TF-IDF', 'longformer':'Longformer'}
-#     dirs_df = filter_model_dirs(Task='response', tuned=False, models=models)
-#     dirs_df.Model.replace(model_mapping, inplace=True)
-#     print(dirs_df.Model)
-#     model_dict = read_predictions(dirs_df)
-#     fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(5,4), dpi=400)
-#     plot_auc_all(model_dict, ax)
-#     plt.legend(loc="lower right", fontsize=8, framealpha=0.0)
-#     plt.title(title, fontsize=10)
-#     saving_dir = join(base_dir, 'plots2/seq_length')
-#     if not exists(saving_dir):
-#         os.mkdir(saving_dir)
-#     filename= join(saving_dir, '_auc')
-#     plt.savefig(filename, dpi=400)
-#
-#     fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(5, 4), dpi=400)
-#     plot_auc_bootstrap(model_dict, ax)
-#     filename = join(saving_dir, '_auc_bootsrtap')
-#     plt.title(title, fontsize=10)
-#     plt.savefig(filename, dpi=400)
-#     plt.close()
 
 def plot_compare_seq_length(task='response', tuned=False):
 
@@ -298,22 +274,22 @@ def plot_compare_model_sizes(task='response',tuned=False ):
     plt.savefig(filename, dpi=400)
     plt.close()
 
-# plot_compare_model_arch('response')
-# plot_compare_model_arch('progression')
+plot_compare_model_arch('response')
+plot_compare_model_arch('progression')
 #
-# plot_compare_domain_adaptation('progression')
+plot_compare_domain_adaptation('progression')
 plot_compare_domain_adaptation(task = 'response')
 
 
-# plot_compare_seq_length(task='response', tuned=False)
-# plot_compare_seq_length(task='response', tuned=True)
-# plot_compare_seq_length(task='progression', tuned=True)
-# plot_compare_seq_length(task='progression', tuned=False)
+plot_compare_seq_length(task='response', tuned=False)
+plot_compare_seq_length(task='response', tuned=True)
+plot_compare_seq_length(task='progression', tuned=True)
+plot_compare_seq_length(task='progression', tuned=False)
 
-# plot_compare_model_sizes(task='response',tuned=False )
-# plot_compare_model_sizes(task='response',tuned=True )
-# plot_compare_model_sizes(task='progression',tuned=False )
-# plot_compare_model_sizes(task='progression',tuned=True )
+plot_compare_model_sizes(task='response',tuned=False )
+plot_compare_model_sizes(task='response',tuned=True )
+plot_compare_model_sizes(task='progression',tuned=False )
+plot_compare_model_sizes(task='progression',tuned=True )
 
 '''
 Model architecture
@@ -328,15 +304,5 @@ Model size
 	base, tiny, med, mini (tuned)
 Training sizes
 '''
-# saving_dir = join(PLOTS_PATH, 'figure1')
-# def read_files(files):
-#     dfs = []
-#     for f in files:
-#         f = join(base_dir, f)
-#         subfiles = listdir(f) '0_testing.csv'
-#         f = join(f, 'all_scores.csv')
-#         df = pd.read_csv(f)
-#         dfs.append(df)
-#     return dfs
 
 

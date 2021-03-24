@@ -32,10 +32,7 @@ linear_df = df[linear_ind].copy()
 print(linear_df)
 print(cnn_df)
 print(rnn_df)
-# '/Users/haithamelmarakeby/PycharmProjects/clinicalNLP2/analysis/gcp_results/updated_labels/bert_classifier'
-# 'any_cancer_one_split_BERT_sizes_tiny_Jan-27_14-48'
 
-# 'any_cancer_one_split_BERT_sizes_tiny_Jan-27_14-59'
 
 
 print (linear_ind)
