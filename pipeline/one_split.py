@@ -22,27 +22,11 @@ from utils.plots import generate_plots, plot_roc, plot_confusion_matrix, plot_pr
 
 # timeStamp = '_{0:%b}-{0:%d}_{0:%H}-{0:%M}'.format(datetime.datetime.now())
 from utils.rnd import set_random_seeds
-# import torch
-# class TorchDataset(torch.utils.data.Dataset):
-#     def __init__(self, encodings, labels):
-#         self.encodings = encodings
-#         self.labels = labels
-#
-#     def __getitem__(self, idx):
-#         item = {key: torch.tensor(val[idx]) for key, val in self.encodings.items()}
-#         item['labels'] = torch.tensor(self.labels[idx])
-#         return item
-#
-#     def __len__(self):
-#         return len(self.labels)
+
 
 class OneSplitPipeline:
     def __init__(self, data_params, pre_params, feature_params,  model_params, pipeline_params, exp_name):
-        # self.data_params = params.data
-        # self.pre_params= params.pre
-        # self.model_params = params.models
-        # self.exp_name = params.exp_name
-        # self.pipeline_params = params.pipeline
+
 
         self.data_params = data_params
         self.pre_params = pre_params
@@ -97,10 +81,7 @@ class OneSplitPipeline:
     def run(self):
         # logging
         logging.info( 'loading data....')
-        # logging.info('model_params: %s', model_params)
-        # logging.info('data_params: %s',data_params)
-        # logging.info('pre_params: %s', pre_params)
-        # data = Data(data_params['type'],**data_params['params'])
+
 
         test_scores = []
         model_names = []
@@ -137,7 +118,10 @@ class OneSplitPipeline:
 
                 model = get_model(m)
                                 
-                model = model.fit(x_train, y_train, x_validate, y_validate)
+                if m['type'] == 'nn':
+                    model = model.fit(x_train, y_train, x_validate, y_validate)
+                else:
+                    model = model.fit(x_train, y_train)
 
                 logging.info('predicting')
                 if self.eval_dataset == 'validation':

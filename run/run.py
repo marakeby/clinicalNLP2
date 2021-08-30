@@ -23,7 +23,8 @@ from os.path import join, dirname, realpath
 current_dir = dirname(realpath(__file__))
 sys.path.insert(0, dirname(current_dir))
 
-from config_path import PROSTATE_LOG_PATH
+# from config_path import PROSTATE_LOG_PATH
+from config_path import CNLP_LOG_PATH
 #any_cancer
 # params_files.append('./params/manual_labels/any_cancer_one_split_tfidf')
 # params_files.append('./params/manual_labels/any_cancer_crossvalidation_tfidf')
@@ -120,6 +121,9 @@ from config_path import PROSTATE_LOG_PATH
 # params_files.append('./params/updated_labels/bert_cnn_arch_size_frozen/response_one_split_BERT_cnn_sizes_mini_frozen')
 # params_files.append('./params/updated_labels/bert_cnn_arch_size_frozen/response_one_split_BERT_cnn_sizes_med_frozen')
 # params_files.append('./params/updated_labels/bert_cnn_arch_size_frozen/response_one_split_BERT_cnn_sizes_base_frozen')
+#----
+# params_files.append('./params/updated_labels/bert_cnn_arch_size_frozen/progression_one_split_BERT_cnn_sizes_mini_frozen')
+# params_files.append('./params/updated_labels/bert_cnn_arch_size_frozen/progression_one_split_BERT_cnn_sizes_med_frozen')
 
 #classifier
 # params_files.append('./params/updated_labels/bert_classifier/any_cancer_one_split_BERT_sizes_tiny')
@@ -138,9 +142,12 @@ from config_path import PROSTATE_LOG_PATH
 # params_files.append('./params/updated_labels/bert_classifier/progression_one_split_BERT_sizes_tiny_frozen')
 # params_files.append('./params/updated_labels/bert_classifier/progression_one_split_BERT_sizes_base_frozen')
 
-params_files.append('./params/updated_labels/bert_classifier/progression_one_split_BERT_sizes_mini_frozen')
-params_files.append('./params/updated_labels/bert_classifier/progression_one_split_BERT_sizes_med_frozen')
+# params_files.append('./params/updated_labels/bert_classifier/progression_one_split_BERT_sizes_mini_frozen')
+# params_files.append('./params/updated_labels/bert_classifier/progression_one_split_BERT_sizes_med_frozen')
 
+#classifier tuned ----
+# params_files.append('./params/updated_labels/bert_classifier/progression_one_split_BERT_sizes_base_frozen_tuned')
+# params_files.append('./params/updated_labels/bert_classifier/response_one_split_BERT_sizes_base_frozen_tuned')
 
 # params_files.append('./params/updated_labels/bert_cnn_arch_size/response_one_split_BERT_cnn_sizes_med_frozen')
 # params_files.append('./params/updated_labels/bert_cnn_arch_size/response_one_split_BERT_cnn_sizes_base_frozen')
@@ -180,7 +187,7 @@ def elapsed_time(start_time, end_time):
 for params_file in params_files:
     timeStamp = '_{0:%b}-{0:%d}_{0:%H}-{0:%M}'.format(datetime.datetime.now())
 #     log_dir = params_file.replace('params', 'logs')
-    log_dir = join(PROSTATE_LOG_PATH, params_file)
+    log_dir = join(CNLP_LOG_PATH, params_file)
     log_dir = log_dir + timeStamp
     set_logging(log_dir)
 
