@@ -68,7 +68,7 @@ class Bert_Torch_Model(BaseEstimator):
         return prediction
 
     def predict_proba(self, X_test):
-        n_samples = len(X_test.input_ids)
+        n_samples = len(X_test['input_ids'])
         print('n_samples', n_samples)
         test_labels = np.ones((n_samples,), np.long)
         test_dataset = get_dataset(X_test, test_labels, type='torch')

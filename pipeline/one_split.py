@@ -245,8 +245,11 @@ class OneSplitPipeline:
         proc = feature_extraction.get_processor(self.features_params)
         if proc:
             proc.fit(x_train)
+            logging.info('x_train')
             x_train = proc.transform(x_train)
+            logging.info('x_test')
             x_test = proc.transform(x_test)
+            logging.info('x_validate')
             x_validate = proc.transform(x_validate)
 
             # if scipy.sparse.issparse(x_train):
