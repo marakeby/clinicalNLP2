@@ -8,7 +8,7 @@ REACTOM_PATHWAY_PATH = join(PATHWAY_PATH, 'Reactome')
 PROSTATE_DATA_PATH = join(DATA_PATH, 'prostate_paper')
 RUN_PATH = join(BASE_PATH, 'run')
 # LOG_PATH = join(dirname(BASE_PATH), 'logs')
-LOG_PATH = '/home/haithamelmarakeby/logs_updated'
+LOG_PATH = '/home/haithamelmarakeby/logs_updated2'
 
 CNLP_LOG_PATH = join(LOG_PATH, 'cnlp_testing')
 PARAMS_PATH = join(RUN_PATH, 'params')
