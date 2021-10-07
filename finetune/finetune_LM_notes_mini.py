@@ -72,7 +72,7 @@ def run(bert_model_name='tiny', dataset = 'valid', max_len=512):
     train_data = train_data[train_data.text.str.len() > 50]
 
     # tokenizer = AutoTokenizer.from_pretrained(model_name, truncation=True, padding=True, max_len=512)
-    tokenizer = AutoTokenizer.from_pretrained(model_name, truncation=True, padding=True, max_len=max_len)
+    tokenizer = AutoTokenizer.from_pretrained(model_name, truncation=False, padding=True, max_len=max_len)
 
     data_collator = DataCollatorForLanguageModeling(
         tokenizer=tokenizer, mlm=True, mlm_probability=0.15
