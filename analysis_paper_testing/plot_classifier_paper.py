@@ -7,8 +7,8 @@ from matplotlib import pyplot as plt
 from config_path import PLOTS_PATH, TEST_RESULTS_PATH
 
 # saving_dir = join(saving_dir, 'classifier')
-task = 'progression_tuned'
-# task = 'response_tuned'
+# task = 'progression_tuned'
+task = 'response_tuned'
 
 
 base_dir = ''
@@ -65,7 +65,6 @@ number_patients= [884,592,214,103,68, 35]
 # # legend=['Tiny BERT', 'Mini BERT', 'Med BERT', 'Base BERT' , 'Longformer']
 
 
-
 for c in cols_map.keys():
     plt.figure()
     ax = plt.subplot(111)
@@ -77,6 +76,7 @@ for c in cols_map.keys():
     plt.legend(legend, loc='lower right')
     plt.xlabel('Number of patients')
     plt.ylabel(cols_map[c])
+    plt.ylim((0,1))
     ax.spines['right'].set_visible(False)
     ax.spines['top'].set_visible(False)
 
