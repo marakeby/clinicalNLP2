@@ -2,7 +2,8 @@ from copy import deepcopy
 from os.path import join, exists
 
 from matplotlib.ticker import FormatStrFormatter
-
+from sklearn.metrics import confusion_matrix
+from analysis_paper_testing.plot_utils import plot_confusion_matrix
 from file_browser_testing import get_models
 import pandas as pd
 from matplotlib import pyplot as plt
@@ -165,10 +166,7 @@ def boxplot_csutom(data_df, ax, colors_dict, labels=None):
         ax.plot(y, x, '.', markersize=2, alpha=0.1, color= colors_dict[model_name])
 
 
-def plot_auc_bootstrap(all_models_dict, ax, sorting_keys=None,  sort_auc=False, introduce_line_on=''):
-    # n = len(all_models_dict.keys())
-    # colors = sns.color_palette(None, n)
-
+def plot_auc_bootstrap(all_models_dict, ax, sorting_keys=None,  sort_auc=False,  pred_col = 'pred_score', metric = metrics.roc_auc_score, introduce_line_on=''):
     all_scores=[]
     names=[]
     xs=[]
@@ -182,8 +180,8 @@ def plot_auc_bootstrap(all_models_dict, ax, sorting_keys=None,  sort_auc=False, 
     for i, k in enumerate(keys):
         df = all_models_dict[k]
         y_test = df['y']
-        y_pred_score = df['pred_score']
-        score, ci_lower, ci_upper, scores = score_ci(y_test, y_pred_score, score_fun=metrics.roc_auc_score,
+        y_pred_score = df[pred_col]
+        score, ci_lower, ci_upper, scores = score_ci(y_test, y_pred_score, score_fun=metric,
                                                      n_bootstraps=1000, seed=123)
         all_scores.append(scores)
         names.append(k)
@@ -204,7 +202,7 @@ def plot_auc_bootstrap(all_models_dict, ax, sorting_keys=None,  sort_auc=False, 
     all_scores_df.columns =names
 
     boxplot_csutom(all_scores_df, ax, colors_dict=model_colors, labels=labels)
-    plt.ylim(0.7, 1.0)
+    plt.ylim(0.8*all_scores_df.min().min(),1. )
     plt.locator_params(axis="y", nbins=4)
     ax.yaxis.set_major_formatter(FormatStrFormatter('%.2f'))
     ax.grid(axis='y')
@@ -309,6 +307,27 @@ def plot_auc_all(all_models_dict,ax,  sorting_keys=None, sort_auc=False):
         plot_roc(ax, y_test, y_pred_score, None, color=model_colors[model_name], label=model_name)
 
 
+def plot_prc_all(all_models_dict,ax,  sorting_keys=None, sort_auc=False):
+    if sorting_keys is None:
+        keys = all_models_dict.keys()
+    else:
+        keys = sorting_keys
+
+    if sort_auc:
+        keys = sort_dict(all_models_dict)
+
+    for i, k in enumerate(keys):
+        df = all_models_dict[k]
+        y_test = df['y']
+        y_pred_score = df['pred_score']
+        if k in model_mapping.keys():
+            model_name= model_mapping[k]
+        else:
+            model_name= k
+        from plot_utils import plot_prc
+        plot_prc(ax, y_test, y_pred_score, None, color=model_colors[model_name], fontproperties= fontproperties, label=model_name)
+
+
 fontproperties = {'family': 'Arial', 'weight': 'normal', 'size': 10}
 number_patients= [884,592,214,103,68, 35]
 cols_map=dict(accuracy='Accuracy', percision='Precision', auc='AUC', f1='F1',aupr='AUPRC', recall= 'Recall' )
@@ -333,7 +352,9 @@ def plot_figure4(task='response'):
             row.Model = 'DFCI-ImagingBERT'
 
     model_dict = read_predictions(dirs_df)
+
     print ('model_dict', model_dict.keys())
+    ## AUC
     fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(5,4), dpi=400)
     plot_auc_all(model_dict, ax)
     plt.legend(loc="lower right", fontsize=8, framealpha=0.0)
@@ -345,6 +366,8 @@ def plot_figure4(task='response'):
     plt.ylabel('AUROC')
     plt.savefig(filename, dpi=400)
 
+    ## AUC bootstrap
+
     fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(5, 4), dpi=400)
     plot_auc_bootstrap(model_dict, ax)
     filename = join(saving_dir, '_auc_bootsrtap_tuned')
@@ -352,6 +375,28 @@ def plot_figure4(task='response'):
     plt.ylabel('AUROC')
     plt.savefig(filename, dpi=400)
     plt.close()
+
+    ## PRC
+    fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(5, 4), dpi=400)
+    plot_prc_all(model_dict, ax)
+    plt.legend(loc="lower right", fontsize=8, framealpha=0.0)
+    plt.title(title, fontsize=10)
+    saving_dir = join(PLOTS_PATH, 'figure4_model_arch_{}'.format(task))
+    if not exists(saving_dir):
+        os.mkdir(saving_dir)
+    filename = join(saving_dir, '_prc_tuned')
+    plt.savefig(filename, dpi=400)
+    plt.close()
+
+    # PRC bootstrap
+    fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(5, 4), dpi=400)
+    plot_auc_bootstrap(model_dict, ax, metric=metrics.average_precision_score)
+    ax.set_ylabel('AUPPRC')
+    filename = join(saving_dir, '_prc_bootsrtap_tuned')
+    plt.title(title, fontsize=10)
+    plt.savefig(filename, dpi=400)
+    plt.close()
+
 
 
 # n = 6
@@ -395,12 +440,6 @@ model_mapping = {'BERT (tuned)': 'BERT (tuned)',  'BERT':'BERT', 'clinical BERT'
 # model_colors = { 'BERT':, 'clinical BERT':, 'tfidf': , 'CNN': }
 
 def plot_figure2_compare_domain_adaptation(task = 'response'):
-    # title= 'Domain adaptation'
-
-    # if task=='response':
-    #     title ='Response' + title
-    # elif task =='progression':
-    #     title = 'Progression, ' + title
     title = task.capitalize()
     models = ['BERT', 'clinical BERT']
     dirs_df = filter_model_dirs(Task=task, tuned=[True, False], models=models)
@@ -422,8 +461,6 @@ def plot_figure2_compare_domain_adaptation(task = 'response'):
     keys = ['BERT-base', 'clinical BERT-base', 'DFCI-ImagingBERT']
 
     plot_auc_all(model_dict, ax, sorting_keys=keys, sort_auc=False)
-
-
     plt.legend(loc="lower right", fontsize=8, framealpha=0.0)
     plt.title(title, fontsize=10)
     saving_dir = join(PLOTS_PATH, 'figure2_domain_adaptation_{}'.format(task))
@@ -439,6 +476,62 @@ def plot_figure2_compare_domain_adaptation(task = 'response'):
     plt.title(title, fontsize=10)
     plt.savefig(filename, dpi=400)
     plt.close()
+
+    ## PRC
+    fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(5, 4), dpi=400)
+    plot_prc_all(model_dict, ax, keys, sort_auc=False)
+    plt.legend(loc="lower right", fontsize=8, framealpha=0.0)
+    # plt.title(title, fontsize=10)
+    saving_dir = join(PLOTS_PATH, 'figure2_domain_adaptation_{}'.format(task))
+    if not exists(saving_dir):
+        os.mkdir(saving_dir)
+    filename = join(saving_dir, '_prc')
+    plt.savefig(filename, dpi=400)
+    plt.close()
+
+    # PRC bootstrap
+    fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(5, 4), dpi=400)
+    plot_auc_bootstrap(model_dict, ax, keys, sort_auc=False, metric=metrics.average_precision_score, introduce_line_on='(')
+    ax.set_ylabel('AUPPRC')
+    filename = join(saving_dir, '_prc_bootsrtap')
+    # plt.title(title, fontsize=10)
+    plt.savefig(filename, dpi=400)
+    plt.close()
+
+    metrics_dict = dict(F1=metrics.f1_score, Accuracy=metrics.accuracy_score, Precision=metrics.precision_score,
+                        Recall=metrics.recall_score)
+    for k, metric_func in metrics_dict.items():
+        # print (k , metric_func)
+        fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(5, 4), dpi=400)
+        plot_auc_bootstrap(model_dict, ax, keys, sort_auc=False, metric=metric_func, pred_col='pred')
+        ax.set_ylabel(k)
+        filename = join(saving_dir, '_{}_bootsrtap'.format(k))
+        # plt.title(title, fontsize=10)
+        plt.savefig(filename, dpi=400)
+        plt.close()
+
+    fontproperties = {'family': 'Arial', 'weight': 'normal', 'size': 6}
+
+    for i, k in enumerate(model_dict.keys()):
+        fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(2, 2), dpi=400)
+        df = model_dict[k]
+        y_test = df['y']
+        y_pred_score = df['pred']
+        cnf_matrix = confusion_matrix(y_test, y_pred_score)
+        cm = np.array(cnf_matrix)
+        classes = ['Negative', 'Positive']
+        labels = np.array([['TN', 'FP'], ['FN ', 'TP']])
+
+        plot_confusion_matrix(ax, cm, classes,
+                              labels=labels,
+                              fontproperties=fontproperties,
+                              normalize=True,
+                              cmap=plt.cm.Reds)
+        ax.tick_params(axis=u'both', which=u'both', length=0)
+        # plt.title(title, fontsize=10)
+        filename = join(saving_dir, '_{}_confusion_matrix'.format(k))
+        plt.savefig(filename, dpi=400)
+        plt.close()
 
 
 def plot_compare_seq_length(task='response', tuned=False):
@@ -510,6 +603,7 @@ def plot_figure1_compare_model_sizes(task='response',tuned=False ):
 
     # keys= ['Longformer (base)', 'BERT (base)', 'BERT (med)', 'BERT (mini)', 'BERT (tiny)']
     keys= ['Longformer', 'BERT-base', 'BERT-med', 'BERT-mini', 'BERT-tiny']
+    ## AUC
     fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(5,4), dpi=400)
     plot_auc_all(model_dict,  ax, keys, sort_auc=False)
     plt.legend(loc="lower right", fontsize=8, framealpha=0.0)
@@ -522,24 +616,79 @@ def plot_figure1_compare_model_sizes(task='response',tuned=False ):
     plt.savefig(filename, dpi=400)
     plt.close()
 
-    fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(5, 4), dpi=400)
 
-    # for k in keys:
-    #
-    #     k_new = k.replace('-','(')
-    #     print(k, k_new)
-    #     model_dict[k_new] = model_dict[k]
-    #     del model_dict[k]
-    #
-    # print (model_dict.keys())
-    # keys = [k.replace('-', '(') for k in keys]
-    # model_dict.keys =[k.replace('-','\n') for k in model_dict.keys()]
+
+    #AUC bootstrap
+    fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(5, 4), dpi=400)
     plot_auc_bootstrap(model_dict,  ax, keys, sort_auc=False)
     ax.set_ylabel('AUROC')
     filename = join(saving_dir, '_auc_bootsrtap')
     plt.title(title , fontsize=10)
     plt.savefig(filename, dpi=400)
     plt.close()
+
+    ## PRC
+    fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(5, 4), dpi=400)
+    plot_prc_all(model_dict, ax, keys, sort_auc=False)
+    plt.legend(loc="lower right", fontsize=8, framealpha=0.0)
+    # plt.title(title, fontsize=10)
+    saving_dir = join(PLOTS_PATH, 'figure1_model_size_{}_{}'.format(task, tuned))
+    if not exists(saving_dir):
+        os.mkdir(saving_dir)
+    filename = join(saving_dir, '_prc')
+    plt.savefig(filename, dpi=400)
+    plt.close()
+
+    # PRC bootstrap
+    fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(5, 4), dpi=400)
+    plot_auc_bootstrap(model_dict, ax, keys, sort_auc=False, metric=metrics.average_precision_score)
+    ax.set_ylabel('AUPPRC')
+    filename = join(saving_dir, '_prc_bootsrtap')
+    # plt.title(title, fontsize=10)
+    plt.savefig(filename, dpi=400)
+    plt.close()
+
+    #
+    metrics_dict = dict(F1=metrics.f1_score, Accuracy=metrics.accuracy_score, Precision=metrics.precision_score,Recall= metrics.recall_score)
+    for k, metric_func in metrics_dict.items():
+        # print (k , metric_func)
+        fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(5, 4), dpi=400)
+        plot_auc_bootstrap(model_dict, ax, keys, sort_auc=False, metric=metric_func, pred_col='pred')
+        ax.set_ylabel(k)
+        filename = join(saving_dir, '_{}_bootsrtap'.format(k))
+        # plt.title(title, fontsize=10)
+        plt.savefig(filename, dpi=400)
+        plt.close()
+
+
+    fontproperties = {'family': 'Arial', 'weight': 'normal', 'size': 6}
+
+    for i, k in enumerate(model_dict.keys()):
+        fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(2, 2), dpi=400)
+        df = model_dict[k]
+        y_test = df['y']
+        y_pred_score = df['pred']
+        cnf_matrix = confusion_matrix(y_test, y_pred_score)
+        cm = np.array(cnf_matrix)
+        classes = ['Negative', 'Positive']
+        labels = np.array([['TN', 'FP'], ['FN ', 'TP']])
+
+        plot_confusion_matrix(ax, cm, classes,
+                              labels=labels,
+                              fontproperties=fontproperties,
+                              normalize=True,
+                              cmap=plt.cm.Reds)
+        ax.tick_params(axis=u'both', which=u'both', length=0)
+        # plt.title(title, fontsize=10)
+        filename = join(saving_dir, '_{}_confusion_matrix'.format(k))
+        plt.savefig(filename, dpi=400)
+        plt.close()
+
+
+
+
+
+
 
 plot_figure4('response')
 plot_figure4('progression')

@@ -11,7 +11,7 @@ all_files= get_models()
 
 number_patients= [884,592,214,103,68, 35]
 cols_map=dict(accuracy='Accuracy', precision='Precision', auc='AUC', f1='F1',aupr='AUPRC', recall= 'Recall' )
-xlabel_map=dict(accuracy='Accuracy', precision='Precision', auc='AUROC', f1='F1',aupr='Area under the precision-recall curve (AUPRC)', recall= 'Recall' )
+xlabel_map=dict(accuracy='Accuracy', precision='Precision', auc='AUROC', f1='F1',aupr='AUPRC', recall= 'Recall' )
 
 
 
