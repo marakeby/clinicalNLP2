@@ -22,8 +22,8 @@ train_filename = 'train_text_imaging_only.txt'
 valid_filename = 'valid_text_imaging_only.txt'
 
 input_dir = 'gs://profile-notes/geekfest_files/unlabeled_data/' #directory where input data is stored
-base_dir = '/home/haithamelmarakeby/pretrained_models_truncated' #used save trained model, checkpoints, and logs
-
+# base_dir = '/home/haithamelmarakeby/pretrained_models_truncated' #used save trained model, checkpoints, and logs
+base_dir ='/home/haithamelmarakeby/pretrained_models_truncated/longformer/dfci_longformer_10-2021'
 def truncate(x, n):
     ret = [x[0]] + x[-n:]
     return ret
@@ -90,7 +90,7 @@ def run(bert_model_name='tiny', dataset = 'valid', max_len=512):
     )
 
     trainer = Trainer(
-        model=model,
+        model=bert_model,
         args=training_args,
         data_collator=data_collator,
         train_dataset=input_dataset,
@@ -99,6 +99,7 @@ def run(bert_model_name='tiny', dataset = 'valid', max_len=512):
 
     trainer.train()
 
+    tokenizer.save_pretrained(saving_dir)
     bert_model.save_pretrained(saving_dir)
     print ('saved_file {}'.format(saving_dir))
 

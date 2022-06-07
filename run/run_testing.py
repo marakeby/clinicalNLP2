@@ -43,28 +43,31 @@ from config_path import CNLP_LOG_PATH
 # 
 # params_files.append('./params/cnlp_testing/bert_cnn_arch_size_frozen/progression_one_split_BERT_cnn_sizes_tiny_frozen')
 
-params_files.append('./params/cnlp_testing/bert_cnn_arch_size_frozen/progression_one_split_BERT_cnn_sizes_base_frozen')
-params_files.append('./params/cnlp_testing/bert_cnn_arch_size_frozen/progression_one_split_BERT_cnn_sizes_med_frozen')
-params_files.append('./params/cnlp_testing/bert_cnn_arch_size_frozen/progression_one_split_BERT_cnn_sizes_mini_frozen')
+# params_files.append('./params/cnlp_testing/bert_cnn_arch_size_frozen/progression_one_split_BERT_cnn_sizes_base_frozen')
+# params_files.append('./params/cnlp_testing/bert_cnn_arch_size_frozen/progression_one_split_BERT_cnn_sizes_med_frozen')
+# params_files.append('./params/cnlp_testing/bert_cnn_arch_size_frozen/progression_one_split_BERT_cnn_sizes_mini_frozen')
 
 
-params_files.append('./params/cnlp_testing/bert_cnn_arch_size_frozen/response_one_split_BERT_cnn_sizes_base_frozen')
-params_files.append('./params/cnlp_testing/bert_cnn_arch_size_frozen/response_one_split_BERT_cnn_sizes_med_frozen')
-params_files.append('./params/cnlp_testing/bert_cnn_arch_size_frozen/response_one_split_BERT_cnn_sizes_mini_frozen')
-params_files.append('./params/cnlp_testing/bert_cnn_arch_size_frozen/response_one_split_BERT_cnn_sizes_tiny_frozen')
+# params_files.append('./params/cnlp_testing/bert_cnn_arch_size_frozen/response_one_split_BERT_cnn_sizes_base_frozen')
+# params_files.append('./params/cnlp_testing/bert_cnn_arch_size_frozen/response_one_split_BERT_cnn_sizes_med_frozen')
+# params_files.append('./params/cnlp_testing/bert_cnn_arch_size_frozen/response_one_split_BERT_cnn_sizes_mini_frozen')
+# params_files.append('./params/cnlp_testing/bert_cnn_arch_size_frozen/response_one_split_BERT_cnn_sizes_tiny_frozen')
 
 #
 #   --------- tuned_bert_cnn_frozen
 #
     
-params_files.append('./params/cnlp_testing/tuned_bert_cnn_frozen/progression_one_split_BERT_cnn_sizes_tiny_frozen')
+# params_files.append('./params/cnlp_testing/tuned_bert_cnn_frozen/progression_one_split_BERT_cnn_sizes_tiny_frozen')
+# params_files.append('./params/cnlp_testing/tuned_bert_cnn_frozen/progression_one_split_BERT_cnn_sizes_tiny_frozen_truncated')
 
-params_files.append('./params/cnlp_testing/tuned_bert_cnn_frozen/progression_one_split_BERT_cnn_sizes_base_frozen')
+# params_files.append('./params/cnlp_testing/tuned_bert_cnn_frozen/progression_one_split_BERT_cnn_sizes_base_frozen')
+# params_files.append('./params/cnlp_testing/tuned_bert_cnn_frozen/response_one_split_BERT_cnn_sizes_base_frozen')
+# params_files.append('./params/cnlp_testing/tuned_bert_cnn_frozen/response_one_split_BERT_cnn_sizes_tiny_frozen')
 
-params_files.append('./params/cnlp_testing/tuned_bert_cnn_frozen/response_one_split_BERT_cnn_sizes_base_frozen')
-
-params_files.append('./params/cnlp_testing/tuned_bert_cnn_frozen/response_one_split_BERT_cnn_sizes_tiny_frozen')
-
+# params_files.append('./params/cnlp_testing/tuned_bert_cnn_frozen_truncated/progression_one_split_BERT_cnn_sizes_base_frozen')
+# params_files.append('./params/cnlp_testing/tuned_bert_cnn_frozen_truncated/response_one_split_BERT_cnn_sizes_base_frozen')
+# params_files.append('./params/cnlp_testing/tuned_bert_cnn_frozen_truncated/progression_one_split_BERT_cnn_sizes_tiny_frozen')
+# params_files.append('./params/cnlp_testing/tuned_bert_cnn_frozen_truncated/response_one_split_BERT_cnn_sizes_tiny_frozen')
 
 ##. longformer
 
@@ -73,10 +76,20 @@ params_files.append('./params/cnlp_testing/tuned_bert_cnn_frozen/response_one_sp
 # params_files.append('./params/cnlp_testing/longformer/progression_one_split_BERT_cnn_sizes_long')
 # params_files.append('./params/cnlp_testing/longformer/progression_one_split_BERT_cnn_sizes_long_tuned')
 
+##. longformer
+
+# params_files.append('./params/cnlp_testing/longformer_truncated/response_one_split_BERT_cnn_sizes_long_tuned')
+# params_files.append('./params/cnlp_testing/longformer_truncated/response_one_split_BERT_cnn_sizes_long')
+
+# params_files.append('./params/cnlp_testing/longformer_truncated/progression_one_split_BERT_cnn_sizes_long')
+# params_files.append('./params/cnlp_testing/longformer_truncated/progression_one_split_BERT_cnn_sizes_long_tuned')
+
+
 ##. Classifier
 
 # params_files.append('./params/cnlp_testing/bert_classifier/progression_one_split_BERT_sizes_base_frozen_tuned')
 # params_files.append('./params/cnlp_testing/bert_classifier/response_one_split_BERT_sizes_base_frozen_tuned')
+params_files.append('./params/cnlp_testing/bert_classifier/progression_one_split_BERT_sizes_tiny_frozen_tuned')
 
 
 def elapsed_time(start_time, end_time):

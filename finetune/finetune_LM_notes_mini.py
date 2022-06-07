@@ -74,6 +74,8 @@ def run(bert_model_name='tiny', dataset = 'valid', max_len=512):
     # tokenizer = AutoTokenizer.from_pretrained(model_name, truncation=True, padding=True, max_len=512)
     tokenizer = AutoTokenizer.from_pretrained(model_name, truncation=False, padding=True, max_len=max_len)
 
+    tokenizer.save_pretrained(saving_dir)
+    
     data_collator = DataCollatorForLanguageModeling(
         tokenizer=tokenizer, mlm=True, mlm_probability=0.15
     )
@@ -102,9 +104,11 @@ def run(bert_model_name='tiny', dataset = 'valid', max_len=512):
 
     trainer.train()
 
+    
+
     bert_model.save_pretrained(saving_dir)
     print ('saved_file {}'.format(saving_dir))
 
 if __name__=="__main__":
     #use validartion data only 
-    run(bert_model_name='mini', dataset = 'train', max_len=512)
+    run(bert_model_name='base', dataset = 'train', max_len=512)

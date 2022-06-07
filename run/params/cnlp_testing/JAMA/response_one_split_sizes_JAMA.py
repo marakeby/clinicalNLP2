@@ -12,7 +12,7 @@ data=[]
 
 for i in training_splits:
     d = deepcopy(data_base)
-    d['id'] = 'any_cancer_{}'.format(i)
+    d['id'] = 'response_{}'.format(i)
     d['params']['training_split'] = i
     print (d)
     data.append(d)
