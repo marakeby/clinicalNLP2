@@ -1,6 +1,9 @@
 
 import torch
 from torch import nn
+import logging
+from torch.nn.utils.rnn import pack_padded_sequence, pad_packed_sequence
+
 
 
 
@@ -12,26 +15,62 @@ class RNN_Over_BERT(nn.Module):
         self.bert = bert
 
         embedding_dim = bert.config.to_dict()['hidden_size']
-        self.rnn = nn.GRU(embedding_dim,
+#         self.rnn = nn.GRU(embedding_dim,
+#                           nhid,
+#                           num_layers=n_layers,
+#                           bidirectional=bidirectional,
+#                           batch_first=True,
+#                           dropout=0 if n_layers < 2 else dropout)
+
+        self.rnn = nn.LSTM(embedding_dim,
                           nhid,
                           num_layers=n_layers,
                           bidirectional=bidirectional,
                           batch_first=True,
                           dropout=0 if n_layers < 2 else dropout)
+            
+        
+#         self.out = nn.Linear(nhid * 2 if bidirectional else nhid, output_dim)
 
-        self.out = nn.Linear(nhid * 2 if bidirectional else nhid, output_dim)
-
+        self.fc1 = nn.Linear(nhid * 2 if bidirectional else nhid, nhid)
+        self.fc2 = nn.Linear(nhid, output_dim)
+        
         # dropout layer
         self.dropout = nn.Dropout(dropout)
-        # relu activation function
-        # self.relu = nn.ReLU()
-        # # dense layer 1
-        # self.fc1 = nn.Linear(nhid, 128)
-        # # dense layer 2 (Output layer)
-        # self.fc2 = nn.Linear(128, nlabels)
-        # # softmax activation function
-        # self.softmax = nn.LogSoftmax(dim=1)
+        self.relu = nn.ReLU()
+        count_parameters = sum(p.numel() for p in self.parameters() if p.requires_grad)
+        logging.info('RNN count parameters {}'.format(count_parameters))
 
+
+    def attention_net(self, lstm_output, final_state): 
+        '''
+        https://github.com/prakashpandey9/Text-Classification-Pytorch/blob/master/models/LSTM_Attn.py
+            Arguments
+            ---------
+
+            lstm_output : Final output of the LSTM which contains hidden layer outputs for each sequence.
+            final_state : Final time-step hidden state (h_n) of the LSTM
+
+            ---------
+
+            Returns : It performs attention mechanism by first computing weights for each of the sequence present in lstm_output and and then finally computing the
+                      new hidden state.
+
+            Tensor Size :
+                        hidden.size() = (batch_size, hidden_size)
+                        attn_weights.size() = (batch_size, num_seq)
+                        soft_attn_weights.size() = (batch_size, num_seq)
+                        new_hidden_state.size() = (batch_size, hidden_size)
+
+        '''
+        hidden = final_state.squeeze(0)
+        attn_weights = torch.bmm(lstm_output, hidden.unsqueeze(2)).squeeze(2)
+        soft_attn_weights = F.softmax(attn_weights, 1)
+        new_hidden_state = torch.bmm(lstm_output.transpose(1, 2), soft_attn_weights.unsqueeze(2)).squeeze(2)
+
+        return new_hidden_state
+    
+    
     # define the forward pass
     def forward(self,
             input_ids,
@@ -61,31 +100,32 @@ class RNN_Over_BERT(nn.Module):
             pooled_output = bert_outputs[1]
             sequence_output = bert_outputs[0]
 
-        _, hidden = self.rnn(sequence_output)
+#         _, hidden = self.rnn(sequence_output)
 
-        # hidden = [n layers * n directions, batch size, emb dim]
-
+            
+        output, (hidden, final_cell_state) = self.rnn(sequence_output)
+        
         if self.rnn.bidirectional:
             hidden = self.dropout(torch.cat((hidden[-2, :, :], hidden[-1, :, :]), dim=1))
         else:
             hidden = self.dropout(hidden[-1, :, :])
 
-        # hidden = [batch size, hid dim]
+        print ('hidden size', hidden.size())
+    
+#         output = output.permute(1, 0, 2) # output.size() = (batch_size, num_seq, hidden_size)
 
-        output = self.out(hidden)
+#         attn_output = self.attention_net(output, hidden)
+        
+#         rel = self.relu(hidden)
+        dense1 = self.fc1(hidden)
+        drop = self.dropout(dense1)
+        output = self.fc2(drop)
+        
+#         ret = self.fc1(hidden)
+#         output = self.fc2(ret)
+        
+#         output = self.out(hidden)
 
-        # # conv= nn.Conv1d()
-        # cnn1d_1 = nn.Conv1d(in_channels=1, out_channels=1, kernel_size=3, stride=1)
-        # self.convs1 = nn.ModuleList([nn.Conv2d(1, Co, (K, D)) for K in Ks])
-        #
-        # x= cnn1d_1(sequence_output)
-        # x = self.fc1(pooled_output)
-        # x = self.relu(x)
-        # x = self.dropout(x)
-        # # output layer
-        # x = self.fc2(x)
-        #
-        # # apply softmax activation
-        # # x = self.softmax(x)
+      
 
         return output, bert_outputs

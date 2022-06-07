@@ -58,8 +58,7 @@ training_args = TrainingArguments(
 # bert_model_name= 'google/bert_uncased_L-4_H-256_A-4'
 # bert_model_name= 'google/bert_uncased_L-8_H-512_A-8'
 # bert_model_name= 'google/bert_uncased_L-12_H-768_A-12'
-# bert_model_name = '/home/haithamelmarakeby/pretrained_models/base_bert_tuned_notes'
-bert_model_name = '/home/haithamelmarakeby/pretrained_models_truncated/base/train/model'
+bert_model_name = '/home/haithamelmarakeby/pretrained_models/base_bert_tuned_notes'
 
 classifier_params_cnn = dict(nhid=120, output_dim=2, nfilters=120, filter_sizes=[3,5], dropout=0.2)
 classifier_params_linear = dict(nhid=120, output_dim=2, dropout=0.2)
@@ -101,7 +100,7 @@ models = [bert_cnn, bert_linear, bert_rnn]
 
 max_length = 512
 
-features = { 'type' : 'bert_tokenizer', 'params': dict(model_name= bert_model_name, truncation= True, padding=True, max_length= max_length)}
+features = { 'type' : 'bert_tokenizer', 'parmas': dict(model_name= bert_model_name, truncation= True, padding=True, max_length= max_length)}
 # features = { 'type' : 'bert_tokenizer', 'parmas': {'model_name': bert_model_name, 'truncation': True, 'padding': True}}
 feature_selection =[]
-pipeline = {'type':  'one_split', 'params': { 'save_train' : True, 'eval_dataset':'testing'}}
+pipeline = {'type':  'one_split', 'params': { 'save_train' : True, 'eval_dataset':'validation'}}

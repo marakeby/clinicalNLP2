@@ -7,16 +7,20 @@ from model.torch_models.bert_cnn import CNN_Over_BERT
 from model.torch_models.bert_linear import Linear_Over_BERT
 from model.torch_models.bert_rnn import RNN_Over_BERT
 
-training_splits = [0,1,4,6,7,9]
-number_reports = [11182,7382,2897,1214, 865, 453 ]
-number_patients= [884,592,214,103,68, 35 ]
+# training_splits = [0,1,4,6,7,9]
+# number_reports = [11182,7382,2897,1214, 865, 453 ]
+# number_patients= [884,592,214,103,68, 35 ]
+
+training_splits = [0]
+number_reports = [11182]
+number_patients= [884]
 
 
 filename = os.path.basename(__file__)
-d_base = dict(id='response',
+d_base = dict(id='progression',
               type= 'updated_label',
               params = {
-                        'outcome': 'response',
+                        'outcome': 'progression',
                         'text': 'NARR+IMPRESS',
                         'training_split':0, 'cloud':True
               }
@@ -24,7 +28,7 @@ d_base = dict(id='response',
 data=[]
 for i in training_splits:
     d = deepcopy(d_base)
-    d['id'] = 'response_{}'.format(i)
+    d['id'] = 'progression_{}'.format(i)
     d['params']['training_split'] = i
     print (d)
     data.append(d)
@@ -59,7 +63,9 @@ training_args = TrainingArguments(
 # bert_model_name= 'google/bert_uncased_L-8_H-512_A-8'
 # bert_model_name= 'google/bert_uncased_L-12_H-768_A-12'
 # bert_model_name = '/home/haithamelmarakeby/pretrained_models/base_bert_tuned_notes'
-bert_model_name = '/home/haithamelmarakeby/pretrained_models_truncated/base/train/model'
+# bert_model_name = '/home/haithamelmarakeby/pretrained_models_truncated/base/train/model'
+bert_model_name = '/home/haithamelmarakeby/pretrained_models_truncated/tiny/train/model'
+
 
 classifier_params_cnn = dict(nhid=120, output_dim=2, nfilters=120, filter_sizes=[3,5], dropout=0.2)
 classifier_params_linear = dict(nhid=120, output_dim=2, dropout=0.2)
@@ -96,7 +102,8 @@ bert_rnn = {
 }
 
 
-models = [bert_cnn, bert_linear, bert_rnn]
+# models = [bert_cnn, bert_linear, bert_rnn]
+models = [ bert_rnn]
 
 
 max_length = 512
@@ -104,4 +111,5 @@ max_length = 512
 features = { 'type' : 'bert_tokenizer', 'params': dict(model_name= bert_model_name, truncation= True, padding=True, max_length= max_length)}
 # features = { 'type' : 'bert_tokenizer', 'parmas': {'model_name': bert_model_name, 'truncation': True, 'padding': True}}
 feature_selection =[]
-pipeline = {'type':  'one_split', 'params': { 'save_train' : True, 'eval_dataset':'testing'}}
+# pipeline = {'type':  'one_split', 'params': { 'save_train' : True, 'eval_dataset':'testing'}}
+pipeline = {'type':  'one_split', 'params': { 'save_train' : True, 'eval_dataset':'validation'}}
