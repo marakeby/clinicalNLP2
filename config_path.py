@@ -14,5 +14,6 @@ CNLP_LOG_PATH = join(LOG_PATH, 'cnlp_testing')
 PARAMS_PATH = join(RUN_PATH, 'params')
 POSTATE_PARAMS_PATH = join(PARAMS_PATH, 'P1000')
 
-GCP_RESULTS_PATH  = '/Users/haithamelmarakeby/PycharmProjects/clinicalNLP2/_gcp_results'
-PLOTS_PATH  = join(BASE_PATH, '_plots_paper')
+# GCP_RESULTS_PATH  = '/Users/haithamelmarakeby/PycharmProjects/clinicalNLP2/_gcp_results'
+TEST_RESULTS_PATH  = join(BASE_PATH, '_cnlp_testing_logs_truncation')
+PLOTS_PATH  = join(BASE_PATH, '_plots_paper_test_truncation3')
