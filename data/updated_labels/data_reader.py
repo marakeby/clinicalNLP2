@@ -1,13 +1,8 @@
-
 import pandas as pd
-from os.path import dirname, join
+from os.path import join
 import numpy as np
 
 from config_path import DATA_PATH
-
-# dir_path = dirname(dirname(__file__))
-import logging
-
 
 def read_file_gc(filename, fs):
     print(filename)
