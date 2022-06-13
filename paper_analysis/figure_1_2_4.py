@@ -1,6 +1,6 @@
 from os.path import join, exists
 from matplotlib.ticker import FormatStrFormatter
-from sklearn.metrics import confusion_matrix
+from sklearn.metrics import confusion_matrix, precision_recall_curve
 from paper_analysis.plot_utils import plot_confusion_matrix
 from file_browser_testing import get_models
 import pandas as pd
@@ -43,6 +43,23 @@ all_models = ['BERT', 'BERT (tuned)', 'clinical BERT', 'CNN', 'tfidf', 'Longform
 model_mapping = {'BERT (tuned)': 'BERT (tuned)',  'BERT':'BERT', 'clinical BERT': 'clinical BERT', 'tfidf': 'TF-IDF', 'CNN': 'CNN', 'Longformer':'Longformer'}
 
 
+# f1 maximization
+def expect_f1(y_prob, thres):
+    idxs = np.where(y_prob >= thres)[0]
+    tp = y_prob[idxs].sum()
+    fp = len(idxs) - tp
+    idxs = np.where(y_prob < thres)[0]
+    fn = y_prob[idxs].sum()
+    return 2 * tp / (2 * tp + fp + fn)
+
+
+def optimal_threshold(y_prob):
+    y_prob = np.sort(y_prob)[::-1]
+    f1s = [expect_f1(y_prob, p) for p in y_prob]
+    thres = y_prob[np.argmax(f1s)]
+    return thres, f1s
+
+
 def filter_model_dirs(Task, tuned, models, size=None):
     if size is None:
         size = ['base', 'NA']
@@ -61,6 +78,24 @@ def filter_model_dirs(Task, tuned, models, size=None):
     print(response_dirs[['Frozen', 'Model', 'Size', 'Task', 'Tuned', 'classifier']])
     return response_dirs
 
+# def read_predictions(dirs_df, training =False):
+#     model_dict={}
+#     for i, row in dirs_df.iterrows():
+#         dir_ = row.file
+#         # model = row.Model + '_' +row.Size
+#         model = row.Model
+#         dir_ = join(TEST_RESULTS_PATH, dir_)
+#         if training:
+#             ext = '0_traing.csv'
+#         else:
+#             ext = '0_testing.csv'
+#         prediction_file = [join(dir_,f) for f in listdir(dir_) if ext in f][0]
+#         pred_df = pd.read_csv(prediction_file)
+#         print(pred_df.shape)
+#         print(pred_df.head())
+#         model_dict[model] = pred_df
+#     return model_dict
+
 def read_predictions(dirs_df):
     model_dict={}
     for i, row in dirs_df.iterrows():
@@ -69,9 +104,34 @@ def read_predictions(dirs_df):
         dir_ = join(TEST_RESULTS_PATH, dir_)
         prediction_file = [join(dir_,f) for f in listdir(dir_) if '0_testing.csv' in f][0]
         pred_df = pd.read_csv(prediction_file)
-        print(pred_df.shape)
-        print(pred_df.head())
+
+        if max_f1:
+            prediction_file_train = [join(dir_, f) for f in listdir(dir_) if '0_traing.csv' in f][0]
+            pred_df_train = pd.read_csv(prediction_file_train)
+
+            y_pred_score_train = pred_df_train['pred_score']
+            # y_pred = pred_df_train['pred']
+            # y_train = pred_df_train['y']
+            # precision, recall, thresholds = precision_recall_curve(y_train, y_pred_score)
+            # f1_scores = 2 * recall * precision / (recall + precision)
+            # th = thresholds[np.argmax(f1_scores)]
+
+            th, f1s = optimal_threshold(y_pred_score_train)
+            y_pred = pred_df['pred_score'] >= th
+            pred_df['pred'] = y_pred
+
+            # print(k)
+            # print('Best threshold: ', thresholds[np.argmax(f1_scores)])
+            # print('Best F1-Score: ', np.max(f1_scores))
+            # pred_df['pred'] = pred_df['pred_score'] >th
+        # else:
+        #     ext=''
+        #     y_pred = df['pred']
+
+        # print(pred_df.shape)
+        # print(pred_df.head())
         model_dict[model] = pred_df
+        # model_dict[model+'_train'] = pred_df_train
     return model_dict
 
 def plot_roc(ax, y_test, y_pred_score, save_dir,color, label=''):
@@ -418,11 +478,30 @@ def plot_figure2_compare_domain_adaptation(task = 'response'):
     fontproperties = {'family': 'Arial', 'weight': 'normal', 'size': 6}
 
     for i, k in enumerate(model_dict.keys()):
+        if k.endswith('_train'):
+            continue
         fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(2, 2), dpi=400)
         df = model_dict[k]
+        # df_train = model_dict[k+'_train']
         y_test = df['y']
-        y_pred_score = df['pred']
-        cnf_matrix = confusion_matrix(y_test, y_pred_score)
+        # y_train = df_train['y']
+        # y_pred_score = df['pred']
+        y_pred = df['pred']
+        # if max_f1:
+        #     ext= '_max_f1'
+        #     y_pred_score = df_train['pred_score']
+        #     precision, recall, thresholds = precision_recall_curve(y_train, y_pred_score)
+        #     f1_scores = 2 * recall * precision / (recall + precision)
+        #     th = thresholds[np.argmax(f1_scores)]
+        #     print(k)
+        #     print('Best threshold: ', thresholds[np.argmax(f1_scores)])
+        #     print('Best F1-Score: ', np.max(f1_scores))
+        #     y_pred = df['pred_score'] >th
+        # else:
+        #     ext=''
+        #     y_pred = df['pred']
+
+        cnf_matrix = confusion_matrix(y_test, y_pred)
         cm = np.array(cnf_matrix)
         classes = ['Negative', 'Positive']
         labels = np.array([['TN', 'FP'], ['FN ', 'TP']])
@@ -433,7 +512,7 @@ def plot_figure2_compare_domain_adaptation(task = 'response'):
                               normalize=True,
                               cmap=plt.cm.Reds)
         ax.tick_params(axis=u'both', which=u'both', length=0)
-        filename = join(saving_dir, '_{}_confusion_matrix'.format(k))
+        filename = join(saving_dir, '_{}_confusion_matrix{}'.format(k, 'max_f1'))
         plt.savefig(filename, dpi=400)
         plt.close()
 
@@ -584,6 +663,7 @@ def plot_figure1_compare_model_sizes(task='response',tuned=False ):
 
 if __name__ == '__main__':
     #Figure 1
+    max_f1 = True
     plot_figure1_compare_model_sizes(task='response',tuned=False )
     plot_figure1_compare_model_sizes(task='progression',tuned=False )
 
