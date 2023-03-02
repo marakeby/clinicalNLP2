@@ -34,6 +34,10 @@ from config_path import CNLP_LOG_PATH
 # params_files.append('./params/cnlp_testing/tfidf/response_one_split_tfidf')
 # params_files.append('./params/cnlp_testing/tfidf/progression_one_split_tfidf')
 
+# params_files.append('./params/cnlp_testing/tfidf/response_one_split_tfidf_nn')
+# params_files.append('./params/cnlp_testing/tfidf/progression_one_split_tfidf_nn')
+# params_files.append('./params/cnlp_testing/tfidf/progression_one_split_tfidf_compare')
+
 #clinical BERT
 # params_files.append('./params/cnlp_testing/clinical_bert/response_one_split_CBERT_cnn_sizes_frozen')
 # params_files.append('./params/cnlp_testing/clinical_bert/progression_one_split_CBERT_cnn_sizes_frozen')
@@ -89,7 +93,12 @@ from config_path import CNLP_LOG_PATH
 
 # params_files.append('./params/cnlp_testing/bert_classifier/progression_one_split_BERT_sizes_base_frozen_tuned')
 # params_files.append('./params/cnlp_testing/bert_classifier/response_one_split_BERT_sizes_base_frozen_tuned')
-params_files.append('./params/cnlp_testing/bert_classifier/progression_one_split_BERT_sizes_tiny_frozen_tuned')
+# params_files.append('./params/cnlp_testing/bert_classifier/progression_one_split_BERT_sizes_tiny_frozen_tuned')
+
+
+##. unfrozen
+# params_files.append('./params/cnlp_testing/unfrozen/progression_BERT_tiny_frozen_unfrozen_linear')
+params_files.append('./params/cnlp_testing/unfrozen/progression_BERT_base_frozen_unfrozen_linear')
 
 
 def elapsed_time(start_time, end_time):
@@ -120,4 +129,4 @@ for params_file in params_files:
     pipeline.run()
     stop = timeit.default_timer()
     mins, secs= elapsed_time(start, stop)
-    logging.info(f'Epoch Time: {mins}m {secs}s')
+    logging.info(f'Total Time: {mins}m {secs}s')
