@@ -1,6 +1,6 @@
 import logging
 import numpy as np
-import tensorflow as tf
+# import tensorflow as tf
 from sklearn.base import BaseEstimator
 from sklearn.metrics import accuracy_score
 from sklearn.utils.extmath import softmax

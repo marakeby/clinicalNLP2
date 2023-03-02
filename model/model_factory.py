@@ -10,7 +10,7 @@ from sklearn.neighbors import KNeighborsClassifier, NearestCentroid
 from sklearn.svm import LinearSVC
 from sklearn.tree import DecisionTreeRegressor, DecisionTreeClassifier
 
-from model import nn
+
 
 
 # get a model object from a dictionary
@@ -107,6 +107,7 @@ def construct_model(model_params_dict):
     #     model = linear_model.LogisticRegression()
 
     elif model_type == 'nn':
+        from model import nn
         model = nn.Model(**p)
 
     elif model_type=='nn_torch':
