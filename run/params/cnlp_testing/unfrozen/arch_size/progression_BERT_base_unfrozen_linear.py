@@ -44,23 +44,36 @@ pre = dict(type= 'clean_text',
            )
 
 fname = splitext(filename)[0]
-training_args = TrainingArguments(
-        output_dir=join('/home/haithamelmarakeby/testing/unfrozen/results/tiny',fname),  # output directory
-        num_train_epochs=20,  # total number of training epochs
+training_args_frozen = TrainingArguments(
+        output_dir=join('/home/haithamelmarakeby/testing/unfrozen/results/base_frozen',fname),  # output directory
+        num_train_epochs=3,  # total number of training epochs
         # per_device_train_batch_size=16,  # batch size per device during training
         per_device_train_batch_size=64,  # batch size per device during training
         per_device_eval_batch_size=64,  # batch size for evaluation
         warmup_steps=500,  # number of warmup steps for learning rate scheduler
         weight_decay=0.01,  # strength of weight decay
-        logging_dir=join('/home/haithamelmarakeby/testing/unfrozen/logs/tiny',fname),  # directory for storing logs
+        logging_dir=join('/home/haithamelmarakeby/testing/unfrozen/logs/base_frozen',fname),  # directory for storing logs
         logging_steps=10,
         save_steps= 100000000,
         save_total_limit= 1,
-        fp16=True
-#         save_strategy="no"
+#         fp16=True
     )
 
 
+training_args_unfrozen = TrainingArguments(
+        output_dir=join('/home/haithamelmarakeby/testing/unfrozen/results/base_unfrozen',fname),  # output directory
+        num_train_epochs=3,  # total number of training epochs
+        # per_device_train_batch_size=16,  # batch size per device during training
+        per_device_train_batch_size=12,  # batch size per device during training
+        per_device_eval_batch_size=12,  # batch size for evaluation
+        warmup_steps=500,  # number of warmup steps for learning rate scheduler
+        weight_decay=0.01,  # strength of weight decay
+        logging_dir=join('/home/haithamelmarakeby/testing/unfrozen/logs/base_unfrozen',fname),  # directory for storing logs
+        logging_steps=10,
+        save_steps= 100000000,
+        save_total_limit= 1,
+#         fp16=True
+    )
 
 classifier_params_cnn = dict(nhid=120, output_dim=2, nfilters=120, filter_sizes=[3,5], dropout=0.2)
 classifier_params_linear = dict(nhid=120, output_dim=2, dropout=0.2)
@@ -75,26 +88,37 @@ base_bert_model_name= 'google/bert_uncased_L-12_H-768_A-12'
 tiny_tuned = '/home/haithamelmarakeby/pretrained_models_truncated/tiny/train/model'
 base_tuned = '/home/haithamelmarakeby/pretrained_models_truncated/base/train/model'
 
-bert_model_name = tiny_bert_model_name
+bert_model_name = base_bert_model_name
 
-bert_frozen= {
+
+
+bert_cnn= {
     'type': 'bert',
-    'id': 'BERT_Frozen',
+    'id': 'BERT_CNN',
     'params': dict(bert_model_name=bert_model_name,
-                   freez_bert=True,
-                   classifier=Linear_Over_BERT,
-                   classifier_params=classifier_params_linear,
-                   training_args=training_args)
+                   freez_bert=False,
+                   classifier=CNN_Over_BERT,
+                   classifier_params=classifier_params_cnn,
+                   training_args=training_args_unfrozen)
 }
 
-bert_unfrozen= {
+bert_rnn= {
     'type': 'bert',
-    'id': 'BERT',
+    'id': 'BERT_RNN',
+    'params': dict(bert_model_name=bert_model_name,
+                   freez_bert=False,
+                   classifier=RNN_Over_BERT,
+                   classifier_params=classifier_params_rnn,
+                   training_args=training_args_unfrozen)
+}
+bert_linear= {
+    'type': 'bert',
+    'id': 'BERT_Linear_med',
     'params': dict(bert_model_name=bert_model_name,
                    freez_bert=False,
                    classifier=Linear_Over_BERT,
                    classifier_params=classifier_params_linear,
-                   training_args=training_args)
+                   training_args=training_args_unfrozen)
 }
 
 
@@ -103,5 +127,5 @@ max_length = 512
 features = { 'type' : 'bert_tokenizer', 'params': dict(model_name= bert_model_name, truncation= True, padding=True, max_length= max_length)}
 # features = { 'type' : 'bert_tokenizer', 'parmas': {'model_name': bert_model_name, 'truncation': True, 'padding': True}}
 feature_selection =[]
-models = [bert_frozen, bert_unfrozen]
+models = [bert_linear ]
 pipeline = {'type':  'one_split', 'params': { 'save_train' : True, 'eval_dataset':'testing'}}
