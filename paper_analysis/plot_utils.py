@@ -77,6 +77,8 @@ def plot_confusion_matrix(ax, cm, classes, fontproperties, labels=None,
     ax.spines['bottom'].set_visible(False)
 
     ax.set_xticks(tick_marks)
-    ax.set_xticklabels(classes, fontproperties)
+    ax.set_xticklabels(classes,  fontdict = fontproperties)
+    ax.set_xticklabels(classes)
     ax.set_yticks([t-0.25 for t in tick_marks])
-    ax.set_yticklabels(classes, fontproperties, rotation=90)
+    ax.set_yticklabels(classes, fontdict = fontproperties, rotation=90)
+    ax.set_yticklabels(classes)
