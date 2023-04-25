@@ -1,5 +1,5 @@
-from keras.preprocessing.text import Tokenizer
-from keras.preprocessing import sequence
+# from keras.preprocessing.text import Tokenizer
+# from keras.preprocessing import sequence
 import logging
 from collections import Counter
 from torchtext.data.utils import get_tokenizer

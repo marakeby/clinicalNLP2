@@ -72,11 +72,11 @@ class UpdatedLabels():
         info = x[['DFCI_MRN', 'ehr_scan_date', 'PROC_DESCR']]
 
         if outcome =='any_cancer':
-            y = x['any_cancer'].map(np.int).copy()
+            y = x['any_cancer'].map(int).copy()
         elif outcome =='response':
-            y = x['response'].map(np.int).copy()
+            y = x['response'].map(int).copy()
         elif outcome =='progression':
-            y = x['progression'].map(np.int).copy()
+            y = x['progression'].map(int).copy()
 
         self.x = x.imaging_text.values
         self.y = y.values

@@ -100,7 +100,36 @@ from config_path import CNLP_LOG_PATH
 # params_files.append('./params/cnlp_testing/unfrozen/progression_BERT_tiny_frozen_unfrozen_linear')
 # params_files.append('./params/cnlp_testing/unfrozen/progression_BERT_base_frozen_unfrozen_linear')
 
-params_files.append('./params/cnlp_testing/unfrozen/progression_DFCI_BERT_base_unfrozen_linear')
+
+#---------------------
+
+
+# params_files.append('./params/cnlp_testing/unfrozen/progression_BERT_tiny_frozen_unfrozen_linear')
+# ''
+#tuned 
+# params_files.append('./params/cnlp_testing/unfrozen/tune/progression_BERT_base_tuned_linear')
+# params_files.append('./params/cnlp_testing/unfrozen/tune/response_BERT_base_tuned_linear')
+
+
+# params_files.append('./params/cnlp_testing/unfrozen/tune/progression_BERT_base_tuned_linear_9')
+# params_files.append('./params/cnlp_testing/unfrozen/tune/progression_BERT_base_tuned_linear_7')
+
+#classifier
+# params_files.append('./params/cnlp_testing/unfrozen/classifier/progression_BERT_base_unfrozen_linear')
+# params_files.append('./params/cnlp_testing/unfrozen/classifier/progression_BERT_base_unfrozen_cnn')
+# params_files.append('./params/cnlp_testing/unfrozen/classifier/progression_BERT_base_unfrozen_rnn')
+
+#arch size
+# params_files.append('./params/cnlp_testing/unfrozen/arch_size/progression_BERT_med_unfrozen_linear')
+# params_files.append('./params/cnlp_testing/unfrozen/arch_size/progression_BERT_tiny_unfrozen_linear')
+# params_files.append('./params/cnlp_testing/unfrozen/arch_size/progression_BERT_mini_unfrozen_linear')
+# params_files.append('./params/cnlp_testing/unfrozen/arch_size/progression_BERT_base_unfrozen_linear')
+
+#clinical
+# params_files.append('./params/cnlp_testing/unfrozen/clinical/progression_clinical_BERT_linear')
+
+params_files.append('./params/cnlp_testing/unfrozen/longformer/progression_longformer_linear')
+
 
 def elapsed_time(start_time, end_time):
     elapsed_time = end_time - start_time

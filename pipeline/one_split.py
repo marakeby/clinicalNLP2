@@ -17,12 +17,21 @@ import scipy.sparse
 import yaml
 import pandas as pd
 from matplotlib import  pyplot as plt
-
+import timeit
+import time
 from utils.plots import generate_plots, plot_roc, plot_confusion_matrix, plot_prc
 
 # timeStamp = '_{0:%b}-{0:%d}_{0:%H}-{0:%M}'.format(datetime.datetime.now())
 from utils.rnd import set_random_seeds
 
+import torch
+import gc
+
+def elapsed_time(start_time, end_time):
+    elapsed_time = end_time - start_time
+    elapsed_mins = int(elapsed_time / 60)
+    elapsed_secs = int(elapsed_time - (elapsed_mins * 60))
+    return elapsed_mins, elapsed_secs
 
 class OneSplitPipeline:
     def __init__(self, data_params, pre_params, feature_params,  model_params, pipeline_params, exp_name):
@@ -111,18 +120,24 @@ class OneSplitPipeline:
             logging.info('feature extraction....')
             x_train, x_validate, x_test = self.extract_features(x_train, x_validate, x_test)
 
-
+    
+    
             for m in self.model_params:
                 # get model
-                set_random_seeds(random_seed=20080808)
+                set_random_seeds(random_seed=818)
 
                 model = get_model(m)
-                                
+                          
+                start = timeit.default_timer()
                 if m['type'] == 'nn':
                     model = model.fit(x_train, y_train, x_validate, y_validate)
                 else:
                     model = model.fit(x_train, y_train)
 
+                stop = timeit.default_timer()
+                mins, secs= elapsed_time(start, stop)
+                
+                
                 logging.info('predicting')
                 if self.eval_dataset == 'validation':
                     x_t = x_validate
@@ -142,9 +157,12 @@ class OneSplitPipeline:
                     model_name = m['type']
 
                 model_name = model_name+'_'+ data_id
+                test_score['time_in_minutes'] = mins +secs/60.
                 test_scores.append(test_score)
                 model_names.append(model_name)
 
+                logging.info(f'{model_name} Training Time: {mins}m {secs}s')
+                
                 logging.info('saving results')
                 self.save_score(test_score, model_name)
                 self.save_prediction(info_t, y_pred_test,y_pred_test_scores, y_t, model_name)
@@ -155,6 +173,14 @@ class OneSplitPipeline:
                 if self.save_train:
                     y_pred_train, y_pred_train_scores, score, train_cnf_matrix= self.predict(model, x_train, y_train)
                     self.save_prediction(info_train, y_pred_train,y_pred_train_scores,  y_train, model_name,  training=True)
+                
+                ## clear memory
+                model.model.cpu()
+                del model
+                gc.collect()
+                torch.cuda.empty_cache()
+                time.sleep(30)
+                
 
         classes = np.unique(y_train)
         auc_fig.savefig(join(self.directory, 'auc_curves'))
