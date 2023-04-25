@@ -1,5 +1,5 @@
 # __author__ = haitham elmarakeby
-from file_browser_testing import get_models
+from file_browser import get_models
 from os.path import join, exists
 from config_path import TEST_RESULTS_PATH, PLOTS_PATH
 from os import listdir
@@ -25,7 +25,7 @@ def optimal_threshold(y_prob):
     thres = y_prob[np.argmax(f1s)]
     return thres, f1s
 
-def filter_model_dirs(Task, tuned, models, size=None):
+def filter_model_dirs(Task, tuned, models, frozen=True, size=None):
     if size is None:
         size = ['base', 'NA']
     else:
@@ -36,12 +36,18 @@ def filter_model_dirs(Task, tuned, models, size=None):
     else:
         tuned = [tuned, 'NA']
 
+    if type(frozen) == list:
+        frozen.append('NA')
+    else:
+        frozen = [frozen, 'NA']
+
     if not type(Task) ==list:
         Task = [Task]
     response_dirs = all_dirs[all_dirs.Task.isin(Task)]
     response_dirs = response_dirs[response_dirs.Model.isin(models)].copy()
     response_dirs = response_dirs[response_dirs.Tuned.isin(tuned)]
     response_dirs = response_dirs[response_dirs.Size.isin(size)]
+    response_dirs = response_dirs[response_dirs.Frozen.isin(frozen)]
     print(response_dirs)
     print(response_dirs[['Frozen', 'Model', 'Size', 'Task', 'Tuned', 'classifier']])
     return response_dirs
@@ -89,17 +95,18 @@ model_mapping = {'BERT (tuned)': 'BERT (tuned)',  'BERT':'BERT', 'clinical BERT'
 all_dirs= get_models()
 
 
-# task = 'progression'
-task = 'response'
+task = 'progression'
+# task = 'response'
 max_f1 = True
 _class = 1 ## _class=1 flips the prediction scores and labels (default = 0)
 models= ['BERT', 'longformer', 'clinical BERT', 'CNN', 'TF-IDF']
 size = ['base', 'mini', 'med', 'tiny', 'NA']
-dirs_df = filter_model_dirs(Task=task, tuned=[False, True], models=models, size=size)
+dirs_df = filter_model_dirs(Task=task, tuned=[False, True], models=models, frozen=False,  size=size)
 
 for i, row in dirs_df.iterrows():
     if row.Tuned == True:
         row.Model = 'DFCI-ImagingBERT'
+
 dirs_df.Model = dirs_df["Model"].astype(str) + '-' + dirs_df["Size"]+'-'+ dirs_df["Task"]
 dirs_df.Model = dirs_df.Model.str.replace('-NA', '')
 model_dict = read_predictions(dirs_df, _class=_class)
