@@ -189,6 +189,15 @@ def get_models():
     filename= join(sub_dir, 'progression_one_split_CBERT_cnn_sizes_frozen_Oct-25_22-18')
     annotated_files.append(dict(Task='progression', Model='clinical BERT', Size='base', Tuned= 'NA', Frozen=True, classifier = 'CNN', file=filename))
 
+    # T5
+    sub_dir= join(base_dir, 't5')
+    
+    filename= join(sub_dir, 'google__flan-t5-xxl-response_0MRNs_0kTrainSteps')
+    annotated_files.append(dict(Task='response', Model='FlanT5-zeroshot', Size='xxl', Tuned= True, Frozen=True, classifier = 'NA', file=filename))
+
+    filename= join(sub_dir, 'google__flan-t5-xxl-progression_0MRNs_0kTrainSteps')
+    annotated_files.append(dict(Task='progression', Model='FlanT5-zeroshot', Size='xxl', Tuned= True, Frozen=True, classifier = 'NA', file=filename))
+
     return  pd.DataFrame(annotated_files)
 
 if __name__ == "__main__":

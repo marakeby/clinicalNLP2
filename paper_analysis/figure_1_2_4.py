@@ -36,11 +36,21 @@ model_colors = {'BERT': '#1f77b4',
 'Longformer (base)':'#7f7f7f',
 'Longformer-base':'#7f7f7f',
 
+'FlanT5-XXL zero-shot':'#008080',
+'FlanT5-zeroshot-xxl':'#008080',
+
 'TF-IDF':'#96be25',
 'CNN':'#be4d25'}
 
-all_models = ['BERT', 'BERT (tuned)', 'clinical BERT', 'CNN', 'tfidf', 'Longformer']
-model_mapping = {'BERT (tuned)': 'BERT (tuned)',  'BERT':'BERT', 'clinical BERT': 'clinical BERT', 'tfidf': 'TF-IDF', 'CNN': 'CNN', 'Longformer':'Longformer'}
+all_models = ['BERT',  'CNN', 'TF-IDF', 'FlanT5-zeroshot']
+model_mapping = {
+    'BERT': 'DFCI-ImagingBERT', 
+    'clinical BERT': 'clinical BERT', 
+    'TF-IDF': 'TF-IDF', 
+    'CNN': 'CNN', 
+    'longformer':'Longformer',
+    'FlanT5-zeroshot-xxl': 'FlanT5-XXL zero-shot'
+}
 
 
 # f1 maximization
@@ -62,7 +72,7 @@ def optimal_threshold(y_prob):
 
 def filter_model_dirs(Task, tuned, models, size=None):
     if size is None:
-        size = ['base', 'NA']
+        size = ['base', 'NA', 'xxl']
     else:
         size= size+["NA"]
     print (size)
@@ -105,7 +115,7 @@ def read_predictions(dirs_df):
         prediction_file = [join(dir_,f) for f in listdir(dir_) if '0_testing.csv' in f][0]
         pred_df = pd.read_csv(prediction_file)
 
-        if max_f1:
+        if max_f1 and not 'zero-shot' in dir_ and not 'zeroshot' in model:
             prediction_file_train = [join(dir_, f) for f in listdir(dir_) if '0_traing.csv' in f][0]
             pred_df_train = pd.read_csv(prediction_file_train)
 
@@ -260,7 +270,7 @@ def plot_auc_bootstrap(all_models_dict, ax, sorting_keys=None,  sort_auc=False, 
         labels=[n.replace(introduce_line_on, '\n') for n in names]
     all_scores_df.columns =names
 
-    boxplot_csutom(all_scores_df, ax, colors_dict=model_colors, labels=labels)
+    boxplot_csutom(all_scores_df, ax, colors_dict=model_colors, labels=[model_mapping[l] if l in model_mapping else l for l in labels])
     plt.ylim(0.8*all_scores_df.min().min(),1. )
     plt.locator_params(axis="y", nbins=4)
     ax.yaxis.set_major_formatter(FormatStrFormatter('%.2f'))
@@ -351,15 +361,16 @@ all_dirs= get_models()
 
 #AUC
 def plot_figure4(task='response'):
-    models = ['BERT', 'CNN', 'TF-IDF']
+    models = ['BERT', 'CNN', 'TF-IDF', 'FlanT5-zeroshot']
     title = task.capitalize()
     dirs_df = filter_model_dirs(Task=task, tuned=True, models=models)
     dirs_df.Model = dirs_df["Model"].astype(str) + '-' + dirs_df["Size"]
     dirs_df.Model = dirs_df.Model.str.replace('-NA','')
 
     for i, row in dirs_df.iterrows():
-        if row.Tuned == True:
+        if row.Tuned == True and row.Model=='BERT':
             row.Model = 'DFCI-ImagingBERT'
+            break
 
     model_dict = read_predictions(dirs_df)
 

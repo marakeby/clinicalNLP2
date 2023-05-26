@@ -56,7 +56,8 @@ def read_predictions(dirs_df):
         prediction_file = [join(dir_,f) for f in listdir(dir_) if '0_testing.csv' in f][0]
         pred_df = pd.read_csv(prediction_file)
 
-        if max_f1:
+
+        if max_f1 and not 'zero-shot' in dir_ and not 'zeroshot' in model:
             prediction_file_train = [join(dir_, f) for f in listdir(dir_) if '0_traing.csv' in f][0]
             pred_df_train = pd.read_csv(prediction_file_train)
             y_pred_score_train = pred_df_train['pred_score']
@@ -70,86 +71,95 @@ def read_predictions(dirs_df):
 
 number_patients= [884,592,214,103,68, 35]
 cols_map=dict(accuracy='Accuracy', precision='Precision', auc='AUC', f1='F1',aupr='AUPRC', recall= 'Recall' )
-all_models = ['BERT', 'BERT (tuned)', 'clinical BERT', 'CNN', 'tfidf', 'Longformer']
-model_mapping = {'BERT (tuned)': 'BERT (tuned)',  'BERT':'BERT', 'clinical BERT': 'clinical BERT', 'tfidf': 'TF-IDF', 'CNN': 'CNN', 'Longformer':'Longformer'}
+all_models = ['BERT', 'BERT (tuned)', 'clinical BERT', 'CNN', 'tfidf', 'Longformer', 't5',]
+model_mapping = {
+    'BERT (tuned)': 'BERT (tuned)',
+    'BERT':'BERT', 
+    'clinical BERT': 'clinical BERT', 
+    'tfidf': 'TF-IDF', 
+    'CNN': 'CNN', 
+    'Longformer':'Longformer',
+    't5-zero-shot': 'FlanT5-zeroshot',
+}
 
 
 all_dirs= get_models()
 
+for task in ['response', 'progression']:
+    max_f1 = True
 
-task = 'progression'
-# task = 'response'
-max_f1 = True
-
-models= ['BERT', 'longformer', 'clinical BERT', 'CNN', 'TF-IDF']
-size = ['base', 'mini', 'med', 'tiny', 'NA']
-dirs_df = filter_model_dirs(Task=task, tuned=[False, True], models=models, size=size)
-
-for i, row in dirs_df.iterrows():
-    if row.Tuned == True:
-        row.Model = 'DFCI-ImagingBERT'
-dirs_df.Model = dirs_df["Model"].astype(str) + '-' + dirs_df["Size"]+'-'+ dirs_df["Task"]
-dirs_df.Model = dirs_df.Model.str.replace('-NA', '')
-model_dict = read_predictions(dirs_df)
+    models= ['BERT', 'FlanT5-zeroshot', 'longformer', 'clinical BERT', 'CNN', 'TF-IDF']
+    size = ['base', 'mini', 'med', 'tiny', 'NA', 'xxl']
+    dirs_df = filter_model_dirs(Task=task, tuned=[False, True], models=models, size=size)
 
 
+    for i, row in dirs_df.iterrows():
+        if row.Tuned == True:
+            row.Model = 'DFCI-ImagingBERT'
+    dirs_df.Model = dirs_df["Model"].astype(str) + '-' + dirs_df["Size"]+'-'+ dirs_df["Task"]
+    dirs_df.Model = dirs_df.Model.str.replace('-NA', '')
+    
+    print('Processing models')
+    print(dirs_df[['Model']])
 
-def evaluate_ci(y_test, y_pred, y_pred_score =None):
-    metric_dict= dict(
-        accuracy=accuracy_score,
-        precision=precision_score,
-        auc= roc_auc_score,
-        f1= f1_score,
-        recall = recall_score,
-        aupr = average_precision_score)
+    model_dict = read_predictions(dirs_df)
 
-    binary_metrics = ['accuracy', 'precision', 'recall', 'f1']
-    avg_scores= {}
-    for metric, metric_func in metric_dict.items():
-        print('metric', metric)
-        if metric in binary_metrics:
-            y = y_pred
+
+
+    def evaluate_ci(y_test, y_pred, y_pred_score =None, mname = '_'):
+        metric_dict= dict(
+            accuracy=accuracy_score,
+            precision=precision_score,
+            auc= roc_auc_score,
+            f1= f1_score,
+            recall = recall_score,
+            aupr = average_precision_score)
+
+        binary_metrics = ['accuracy', 'precision', 'recall', 'f1']
+        avg_scores= {}
+        for metric, metric_func in metric_dict.items():
+            print('metric', metric, 'for', mname, end=' ')
+            if metric in binary_metrics:
+                y = y_pred
+            else:
+                y = y_pred_score
+            score, ci_lower, ci_upper, scores_ = score_ci(y_test, y, score_fun=metric_func, n_bootstraps=1000, seed=123)
+            formated_score= '{:.2f} [{:.2f},{:.2f}]'.format(score, ci_lower, ci_upper)
+            print(score)
+            # avg_scores.append(score)
+            avg_scores[metric]= formated_score
+        return avg_scores
+
+
+
+        # score['accuracy'] = accuracy
+        # score['precision'] = precision
+        # score['auc'] = auc
+        # score['f1'] = f1
+        # score['aupr'] = aupr
+        # score['recall'] = recall
+    scores = {}
+    for i, k in enumerate(model_dict.keys()):
+        df = model_dict[k]
+        y_test = df['y']
+        y_pred_score = df['pred_score']
+        y_pred = df['pred']
+        # y_pred = y_pred_score>=0.5
+        # print(k)
+        if k in model_mapping.keys():
+            model_name = model_mapping[k]
         else:
-            y = y_pred_score
-        score, ci_lower, ci_upper, scores_ = score_ci(y_test, y, score_fun=metric_func, n_bootstraps=1000, seed=123)
-        formated_score= '{:.2f} [{:.2f},{:.2f}]'.format(score, ci_lower, ci_upper)
-        print('metric', metric, score)
-        # avg_scores.append(score)
-        avg_scores[metric]= formated_score
-    return avg_scores
+            model_name = k
+        score = evaluate_ci(y_test, y_pred, y_pred_score=y_pred_score, mname = k)
+        scores[model_name] = score
 
+    scores_df = pd.DataFrame(scores)
+    scores_df =scores_df.T
+    print(scores_df)
+    scores_df.columns  = [cols_map[c] for c in scores_df.columns]
 
-
-    # score['accuracy'] = accuracy
-    # score['precision'] = precision
-    # score['auc'] = auc
-    # score['f1'] = f1
-    # score['aupr'] = aupr
-    # score['recall'] = recall
-scores = {}
-for i, k in enumerate(model_dict.keys()):
-    df = model_dict[k]
-    y_test = df['y']
-    y_pred_score = df['pred_score']
-    y_pred = df['pred']
-    # y_pred = y_pred_score>=0.5
-    # print(k)
-    if k in model_mapping.keys():
-        model_name = model_mapping[k]
-    else:
-        model_name = k
-    score = evaluate_ci(y_test, y_pred, y_pred_score =y_pred_score)
-    scores[model_name] = score
-
-print(scores)
-scores_df = pd.DataFrame(scores)
-print(scores_df)
-scores_df =scores_df.T
-print (scores_df.columns)
-scores_df.columns  = [cols_map[c] for c in scores_df.columns]
-
-scores_df = scores_df.round(2)
-save_name = task
-if max_f1:
-    save_name= save_name + '_max_f1'
-scores_df.to_csv(join(PLOTS_PATH, 'table_{}_ci.csv'.format(save_name)))
+    scores_df = scores_df.round(2)
+    save_name = task
+    if max_f1:
+        save_name= save_name + '_max_f1'
+    scores_df.to_csv(join(PLOTS_PATH, 'table_{}_ci.csv'.format(save_name)))

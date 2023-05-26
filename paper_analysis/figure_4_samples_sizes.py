@@ -12,8 +12,15 @@ number_patients= [884,592,214,103,68, 35]
 cols_map=dict(accuracy='Accuracy', precision='Precision', auc='AUC', f1='F1',aupr='AUPRC', recall= 'Recall' )
 xlabel_map=dict(accuracy='Accuracy', precision='Precision', auc='AUROC', f1='F1',aupr='AUPRC', recall= 'Recall' )
 
-all_models = ['BERT',  'CNN', 'TF-IDF']
-model_mapping = {'BERT': 'DFCI-ImagingBERT', 'clinical BERT': 'clinical BERT', 'TF-IDF': 'TF-IDF', 'CNN': 'CNN', 'longformer':'Longformer'}
+all_models = ['BERT',  'CNN', 'TF-IDF', 'FlanT5-zeroshot']
+model_mapping = {
+    'BERT': 'DFCI-ImagingBERT', 
+    'clinical BERT': 'clinical BERT', 
+    'TF-IDF': 'TF-IDF', 
+    'CNN': 'CNN', 
+    'longformer':'Longformer',
+    'FlanT5-zeroshot': 'FlanT5-XXL zero-shot'
+    }
 n = 5
 
 model_colors = {'BERT': '#1f77b4',
@@ -31,6 +38,8 @@ model_colors = {'BERT': '#1f77b4',
 
 'clinical BERT':'#bea925',
 'Longformer':'#7f7f7f',
+
+'FlanT5-XXL zero-shot':'#008080',
 
 'TF-IDF':'#96be25',
 'CNN':'#be4d25'}
@@ -57,14 +66,18 @@ def plot_files(dfs, legend, title, saving_dir ):
                 model_name = cc
             x= number_patients
             y= df[c].values
-            print(model_name)
-
-            if 'TF-IDF' in model_name:
-                plt.plot(x, y, '--', color= model_colors[model_name])
-            elif model_name=='CNN':
-                plt.plot(x, y, '-.', color= model_colors[model_name])
+            
+            if len(y) == 1:
+                plt.hlines(y=y[0], xmin=0, xmax=x[0], 
+                    linestyles='dotted',
+                    color= model_colors[model_name])
             else:
-                plt.plot(x,y, '.-', color= model_colors[model_name])
+                if 'TF-IDF' in model_name:
+                    plt.plot(x, y, '--', color= model_colors[model_name])
+                elif model_name=='CNN':
+                    plt.plot(x, y, '-.', color= model_colors[model_name])
+                else:
+                    plt.plot(x,y, '.-', color= model_colors[model_name])
         legend_normalized = [model_mapping[m] for m in legend]
 
         plt.legend(legend_normalized, loc='lower right')
@@ -83,7 +96,7 @@ def plot_files(dfs, legend, title, saving_dir ):
 def filter_files(all_files, models, task='resposne', tuned=False ):
     Task = task
     # models = ['clinical BERT', 'BERT', 'longformer', 'JAMA', 'tfidf']
-    size = ['base', 'NA']
+    size = ['base', 'NA', 'xxl']
     tuned = [tuned, 'NA']
     response_files = all_files[all_files.Task == Task]
     response_files = response_files[response_files.Model.isin(models)].copy()
