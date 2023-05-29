@@ -10,24 +10,28 @@ def read_file_gc(filename, fs):
         label_analysis = pd.read_csv(f)
     return label_analysis
 
-processed_dir = join(DATA_PATH, 'manual_labels/processed')
+processed_dir = join(DATA_PATH, 'updated_labels')
 
 class UpdatedLabels():
-    def __init__(self, outcome = 'any_cancer', text = 'NARR+IMPRESS', training_split=0, cloud=True):
+    def __init__(self, split_path, outcome = 'any_cancer', text = 'NARR+IMPRESS', training_split=0, cloud=True):
 
         self.training_split = training_split
         self.training_file= 'training_mrns_{}.csv'.format(self.training_split)
+        self.split_path = join(processed_dir, split_path)
         #which dataset to use for training {0: original training, 1, 2, 3..: decreasing sizes of training splits}
         if cloud:
             import gcsfs
-            fs = gcsfs.GCSFileSystem(project='profile-notes')
-            input_dir = 'radiology-impressions-derived-data'
-            updated_labels_filename = 'gs://profile-notes/geekfest_files/labeled_imaging_reports_manual_dedup_10-8-19.feather'
+            fs = gcsfs.GCSFileSystem(project='vanallen-cnlp')
+            
+            updated_labels_filename = 'gs://vanallen-cnlp/profile-notes/geekfest_files/geekfest_files_labeled_imaging_reports_manual_dedup_10-8-19.feather'
             # get training and validation patients
             label_analysis = pd.read_feather(updated_labels_filename)
-            self.validation_mrns = read_file_gc(join(input_dir, 'validation_mrns.csv'), fs)
-            self.testing_mrns = read_file_gc(join(input_dir, 'truetest_mrns.csv'), fs)
-            self.training_mrns = pd.read_csv(join(processed_dir, self.training_file))
+            base_= 'gs://vanallen-cnlp/profile-notes/radiology-impressions-derived-data'
+            self.validation_mrns = pd.read_csv(join(base_, 'validation_mrns.csv'))
+            self.testing_mrns = pd.read_csv(join(base_, 'truetest_mrns.csv'))
+            # self.training_mrns = pd.read_csv(join(base_, 'training_mrns.csv'))
+            
+            self.training_mrns = pd.read_csv(join(self.split_path, self.training_file))
             
         else:
             input_dir = join(DATA_PATH, 'updated_labels/input')
@@ -35,7 +39,7 @@ class UpdatedLabels():
             label_analysis = pd.read_feather(filename)
 
             # get training and validation patients
-            self.training_mrns = pd.read_csv(join(processed_dir, self.training_file))
+            self.training_mrns = pd.read_csv(join(self.split_path, self.training_file))
             self.validation_mrns = pd.read_csv(join(input_dir, 'validation_mrns.csv'))
             self.testing_mrns = pd.read_csv(join(input_dir, 'truetest_mrns.csv'))
 

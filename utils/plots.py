@@ -4,6 +4,7 @@ from os.path import join, exists
 import pandas as pd
 import numpy as np
 import itertools
+import seaborn as sns
 
 from sklearn.metrics import average_precision_score
 
@@ -72,7 +73,43 @@ def plot_box_plot(df, save_dir):
 
         plt.savefig(join(save_dir, c+'_boxplot'))
 
-    pass
+# gets list of data frames, each representing the model scores over n folds
+def plot_box_plot_groupby(df, save_dir, groupby='data'):
+    # df = pd.concat(list_model_scores, axis=1, keys=model_names)
+    # df.columns = df.columns.swaplevel(0, 1)
+
+    for c in df.columns:
+        if not c in groupby:
+            plt.figure()
+            # dd = df[[c]+groupby]
+            sns.boxplot(x="data",hue="model", y=c, data=df)
+            plt.ylim((0,1))
+            plt.savefig(join(save_dir, c+'_flip_boxplot'))
+             
+            plt.figure()
+            sns.boxplot(x="model",hue="data", y=c, data=df)
+            plt.ylim((0,1))
+
+
+            plt.savefig(join(save_dir, c+'_boxplot'))
+            
+            
+            # df.groupby("data").boxplot(column="tip");
+            # ax= dd.boxplot(showfliers=False, by =groupby)
+            # plt.ylim([-0.05,1.05])
+            # ax.set_ylabel(c, fontsize=12)
+            # plt.tight_layout()
+            # plt.setp(ax.get_xticklabels(), rotation=30, horizontalalignment='right')
+            # ax.get_xaxis().set_minor_locator(ticker.AutoMinorLocator())
+            # ax.get_yaxis().set_minor_locator(ticker.AutoMinorLocator())
+
+            # ax.grid(b=True, which='major', color='w', linewidth=1.5)
+            # ax.grid(b=True, which='minor', color='w', linewidth=0.75)
+            plt.ylim((0,1))
+#             plt.gcf().subplots_adjust(bottom=0.25)
+
+#             plt.savefig(join(save_dir, c+'_boxplot'))
+        
 
 # http://scikit-learn.org/stable/auto_examples/model_selection/plot_confusion_matrix.html#sphx-glr-auto-examples-model-selection-plot-confusion-matrix-py
 

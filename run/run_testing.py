@@ -97,10 +97,10 @@ from config_path import CNLP_LOG_PATH
 
 
 ##. unfrozen
-# params_files.append('./params/cnlp_testing/unfrozen/progression_BERT_tiny_frozen_unfrozen_linear')
+params_files.append('./params/cnlp_testing/unfrozen/progression_BERT_tiny_frozen_unfrozen_linear')
 # params_files.append('./params/cnlp_testing/unfrozen/progression_BERT_base_frozen_unfrozen_linear')
 
-params_files.append('./params/cnlp_testing/unfrozen/progression_DFCI_BERT_base_unfrozen_linear')
+# params_files.append('./params/cnlp_testing/unfrozen/progression_DFCI_BERT_base_unfrozen_linear')
 
 def elapsed_time(start_time, end_time):
     elapsed_time = end_time - start_time

@@ -107,7 +107,9 @@ from config_path import CNLP_LOG_PATH
 # params_files.append('./params/cnlp_testing/unfrozen/progression_BERT_tiny_frozen_unfrozen_linear')
 # ''
 #tuned 
+# params_files.append('./params/cnlp_testing/unfrozen/tune/progression_BERT_base_untuned_linear')
 # params_files.append('./params/cnlp_testing/unfrozen/tune/progression_BERT_base_tuned_linear')
+
 # params_files.append('./params/cnlp_testing/unfrozen/tune/response_BERT_base_tuned_linear')
 
 
@@ -128,7 +130,52 @@ from config_path import CNLP_LOG_PATH
 #clinical
 # params_files.append('./params/cnlp_testing/unfrozen/clinical/progression_clinical_BERT_linear')
 
-params_files.append('./params/cnlp_testing/unfrozen/longformer/progression_longformer_linear')
+# params_files.append('./params/cnlp_testing/unfrozen/longformer/progression_longformer_linear')
+
+#-------------------------------
+
+# params_files.append('./params/rerun/tune/progression_BERT_base_tuned_linear')
+# params_files.append('./params/rerun/tune/progression_BERT_base_tuned_cnn_frozen')
+# params_files.append('./params/rerun/raw/progression_BERT_base_cnn_frozen')
+
+# params_files.append('./params/rerun/tune/progression_BERT_base_tuned_linear_smallsize')
+# params_files.append('./params/rerun/tune/progression_BERT_tiny_tuned_linear_old_splits')
+# params_files.append('./params/rerun/tune/progression_BERT_base_tuned_linear_old_splits10')
+
+# params_files.append('./params/rerun/JAMA/progression_one_split_sizes_JAMA_old_splits')
+# params_files.append('./params/rerun/JAMA/response_one_split_sizes_JAMA')
+# params_files.append('./params/rerun/tune/response_BERT_base_tuned_linear')
+
+#TUNED-FROZEN 
+# params_files.append('./params/rerun/frozen/progression_BERT_base_cnn_frozen_small')
+
+#TUNED-UNFROZEN (DFCI_BERT)
+# params_files.append('./params/rerun/unfrozen/progression_BERT_base_linear_tuned_small')
+# params_files.append('./params/rerun/new_splits/DFCI_BERT/unfrozen_bert/response_DFCI_BERT_base_linear_small')
+# params_files.append('./params/rerun/new_splits/DFCI_BERT/unfrozen_bert/response_DFCI_BERT_base_linear_smaller')
+
+# params_files.append('./params/rerun/new_splits/DFCI_BERT/unfrozen_bert/response_DFCI_BERT_base_linear')
+# params_files.append('./params/rerun/new_splits/DFCI_BERT/unfrozen_bert/response_DFCI_BERT_base_linear_smaller_earlystop')
+# params_files.append('./params/rerun/new_splits/DFCI_BERT/unfrozen_bert/response_DFCI_BERT_base_linear_earlystop')
+
+# params_files.append('./params/rerun/new_splits/DFCI_BERT/unfrozen_bert/progression_DFCI_BERT_base_linear')
+
+params_files.append('./params/rerun/new_splits/DFCI_BERT/unfrozen_earlystop/response_DFCI_BERT_base_cnn_earlystop_unfrozen')
+
+
+#TUNED-FROZEN (DFCI_BERT)
+# params_files.append('./params/rerun/new_splits/DFCI_BERT/frozen_bert/progression_DFCI_BERT_base_cnn')
+# params_files.append('./params/rerun/new_splits/DFCI_BERT/frozen_bert/response_DFCI_BERT_base_cnn')
+# params_files.append('./params/rerun/new_splits/DFCI_BERT/frozen_bert/response_DFCI_BERT_base_cnn_earlystop')
+
+
+#TF-IDF
+# params_files.append('./params/rerun/tfidf/progression_one_split_tfidf')
+# params_files.append('./params/rerun/tfidf/progression_one_split_tfidf_newsplit')
+# params_files.append('./params/rerun/tfidf/progression_crossvalidation_tfidf_newsplit')
+#JAMA
+# params_files.append('./params/rerun/new_splits/JAMA/progression_one_split_sizes_JAMA')
+# params_files.append('./params/rerun/new_splits/JAMA/response_one_split_sizes_JAMA')
 
 
 def elapsed_time(start_time, end_time):

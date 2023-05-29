@@ -18,24 +18,29 @@ def get_dataset(encodings,labels, type='tf'):
     else:
         return TorchDataset(encodings, labels)
 
-def get_trainner(model, training_args, train_dataset, val_dataset=None):
+def get_trainer(model, training_args, train_dataset, val_dataset=None, callbacks=None, compute_metrics = None):
 
     trainer = Trainer(
         model=model,  # the instantiated 🤗 Transformers model to be trained
         args=training_args,  # training arguments, defined above
         train_dataset=train_dataset,  # training dataset
-        eval_dataset=val_dataset  # evaluation dataset
+        eval_dataset=val_dataset,  # evaluation dataset
+        
+        compute_metrics = compute_metrics,
+        callbacks = callbacks
     )
     return trainer
 
 class Bert_Torch_Model(BaseEstimator):
-    def __init__(self, bert_model_name, freez_bert, classifier, classifier_params, training_args):
+    def __init__(self, bert_model_name, freez_bert, classifier, classifier_params, training_args, compute_metrics=None, callbacks=None):
         self.bert_model_name  = bert_model_name
         self.classifier  = classifier
         self.freez_bert  = freez_bert
         self.classifier_params  = classifier_params
         # self.model = AutoModelForSequenceClassification.from_pretrained(model_name)
         self.training_args = training_args
+        self.callbacks= callbacks
+        self.compute_metrics = compute_metrics
         self.loss ='sigmoid'
 
 
@@ -58,7 +63,12 @@ class Bert_Torch_Model(BaseEstimator):
         trainable_parmas_no = count_parameters(self.model.bert )
         logging.info('Trainable params no {}'.format(trainable_parmas_no))
         train_dataset = get_dataset(X_train, y_train, type='torch')
-        self.trainer = get_trainner(self.model,self.training_args, train_dataset, train_dataset)
+        if X_val is not None:
+            val_dataset = get_dataset(X_val, y_val, type='torch')
+        else:
+            val_dataset = train_dataset
+
+        self.trainer = get_trainer(self.model,self.training_args, train_dataset, val_dataset, callbacks=self.callbacks, compute_metrics=self.compute_metrics)
         self.trainer.train()
         return self
 

@@ -10,7 +10,7 @@ from pipeline.one_split import OneSplitPipeline
 import pandas as pd
 from os.path import join, exists
 
-from utils.plots import plot_box_plot
+from utils.plots import plot_box_plot_groupby
 from utils.rnd import set_random_seeds
 
 timeStamp = '_{0:%b}-{0:%d}_{0:%H}-{0:%M}'.format(datetime.datetime.now())
@@ -26,48 +26,77 @@ class CrossvalidationPipeline(OneSplitPipeline):
     def run(self, n_splits =5):
         # logging
         logging.info( 'loading data....')
-        data = Data(**self.data_params)
-
-        # get data
-        # X, y, info, cols = data.get_data()
-        x_train, x_test, y_train, y_test, info, info_test, cols = data.get_train_test()
-        X = x_train
-        y = y_train
-
-        # get model
-        logging.info('fitting model ...')
-        list_model_scores= []
+        test_scores_df = pd.DataFrame()
         model_names = []
-        if type(self.model_params) == list:
-            for m in self.model_params:
-                # model_name = m['type']
-                if 'id' in m:
-                    model_name = m['id']
-                else:
-                    model_name = m['type']
+        model_list = []
+        for data_params in self.data_params:
+            print ('data_params',data_params)
+            data_id =  data_params['id']
+            data = Data(**data_params)
+            # data = Data(**self.data_params)
+
+            # get data
+            # X, y, info, cols = data.get_data()
+            x_train, x_test, y_train, y_test, info, info_test, cols = data.get_train_test()
+            X = x_train
+            y = y_train
+
+            # get model
+            logging.info('fitting model ...')
+            list_model_scores= []
+            model_names = []
+            if type(self.model_params) == list:
+                for m in self.model_params:
+                    # model_name = m['type']
+                    if 'id' in m:
+                        model_name = m['id']
+                    else:
+                        model_name = m['type']
 
 
-                set_random_seeds(random_seed=20080808)
+                    set_random_seeds(random_seed=818)
 
 
-                logging.info('fitting model ...')
+                    logging.info('fitting model ...')
 
+                    model_name_extended = '{}_{}'.format(data_id, model_name)
+                    scores = self.train_predict_crossvalidation( m, X, y, info, cols, model_name_extended)
+                    scores_df, scores_mean, scores_std = get_mean_variance(scores)
+                    list_model_scores.append(scores_df)
+                    model_names.append(model_name)
+                    
+                    
+                    self.save_score(scores_df, scores_mean, scores_std, model_name_extended)
+                    scores_df['model'] = model_name
+                    scores_df['data'] = data_id
+                    test_scores_df = test_scores_df.append(scores_df)
+                    # test_scores.append(scores_df)
+                    logging.info('scores')
+                    logging.info(scores_df)
+                    logging.info('mean')
+                    logging.info( scores_mean)
+                    logging.info('std')
+                    logging.info(scores_std)
+                    # logging.info(f'{model_name} Training Time: {mins}m {secs}s')
 
-                scores = self.train_predict_crossvalidation( m, X, y, info, cols, model_name)
-                scores_df, scores_mean, scores_std = get_mean_variance(scores)
-                list_model_scores.append(scores_df)
-                model_names.append(model_name)
-                self.save_score(scores_df, scores_mean, scores_std, m['type'])
-                logging.info('scores')
-                logging.info(scores_df)
-                logging.info('mean')
-                logging.info( scores_mean)
-                logging.info('std')
-                logging.info(scores_std)
+            df = pd.concat(list_model_scores, axis=1, keys=model_names)
+            df.to_csv(join(self.directory,'folds_{}.csv'.format(data_id)))
+            # print(df.head())
+            # plot_box_plot(df, self.directory)
 
-        df = pd.concat(list_model_scores, axis=1, keys=model_names)
-        df.to_csv(join(self.directory,'folds.csv'))
-        plot_box_plot(df, self.directory)
+        # test_scores_df= pd.concat(test_scores, axis=1)
+        test_scores_df.to_csv(join(self.directory,'folds.csv'))
+        plot_box_plot_groupby(test_scores_df, self.directory, groupby=['model', 'data'])
+        # from matplotlib import pyplot as plt
+        # fig, ax = plt.subplots(figsize=(10,8))
+        # plt.suptitle('')
+        # test_scores_df.boxplot(column=['accuracy'], by=['model', 'data'], ax=ax)
+        # plt.savefig(join(self.directory,'accuracy.png'))
+            # test_scores.append(test_score)
+            # model_names.append(model_name)
+            # logging.info(f'{data_id} Training Time: {mins}m {secs}s')
+
+            
 
         return scores_df
 

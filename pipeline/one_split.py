@@ -129,7 +129,7 @@ class OneSplitPipeline:
                 model = get_model(m)
                           
                 start = timeit.default_timer()
-                if m['type'] == 'nn':
+                if m['type'] in[ 'nn', 'bert']:
                     model = model.fit(x_train, y_train, x_validate, y_validate)
                 else:
                     model = model.fit(x_train, y_train)
@@ -175,11 +175,12 @@ class OneSplitPipeline:
                     self.save_prediction(info_train, y_pred_train,y_pred_train_scores,  y_train, model_name,  training=True)
                 
                 ## clear memory
-                model.model.cpu()
-                del model
-                gc.collect()
-                torch.cuda.empty_cache()
-                time.sleep(30)
+                if m['id'] =='bert': ##TODO: clean this (encapsulate inside the model?)
+                    model.model.cpu()
+                    del model
+                    gc.collect()
+                    torch.cuda.empty_cache()
+                    time.sleep(30)
                 
 
         classes = np.unique(y_train)

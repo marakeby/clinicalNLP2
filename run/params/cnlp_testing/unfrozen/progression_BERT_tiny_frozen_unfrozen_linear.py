@@ -7,6 +7,8 @@ from model.torch_models.bert_cnn import CNN_Over_BERT
 from model.torch_models.bert_linear import Linear_Over_BERT
 from model.torch_models.bert_rnn import RNN_Over_BERT
 
+from config_path import LOG_PATH
+
 training_splits = [0,1,4,6,7,9]
 number_reports = [11182,7382,2897,1214, 865, 453 ]
 number_patients= [884,592,214,103,68, 35 ]
@@ -45,14 +47,14 @@ pre = dict(type= 'clean_text',
 
 fname = splitext(filename)[0]
 training_args = TrainingArguments(
-        output_dir=join('/home/haithamelmarakeby/testing/unfrozen/results/tiny',fname),  # output directory
-        num_train_epochs=20,  # total number of training epochs
+        output_dir=join(LOG_PATH,fname),  # output directory
+        num_train_epochs=3,  # total number of training epochs
         # per_device_train_batch_size=16,  # batch size per device during training
         per_device_train_batch_size=64,  # batch size per device during training
         per_device_eval_batch_size=64,  # batch size for evaluation
         warmup_steps=500,  # number of warmup steps for learning rate scheduler
         weight_decay=0.01,  # strength of weight decay
-        logging_dir=join('/home/haithamelmarakeby/testing/unfrozen/logs/tiny',fname),  # directory for storing logs
+        logging_dir=join(LOG_PATH,fname),  # directory for storing logs
         logging_steps=10,
         save_steps= 100000000,
         save_total_limit= 1,

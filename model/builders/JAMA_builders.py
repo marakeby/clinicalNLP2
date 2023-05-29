@@ -1,12 +1,12 @@
 
 import logging
-from keras import Input
-from keras.engine import Model
-from keras.models import Sequential
-from keras.layers import Dense, Dropout, Activation
-from keras.layers import Embedding
-from keras.layers import Conv1D, GlobalMaxPooling1D, concatenate
-from keras.regularizers import l1, l2
+from tensorflow.keras import Input
+from tensorflow.keras import Model
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense, Dropout, Activation
+from tensorflow.keras.layers import Embedding
+from tensorflow.keras.layers import Conv1D, GlobalMaxPooling1D, concatenate
+from tensorflow.keras.regularizers import l1, l2
 from model.model_utils import apply_models, print_model
 import os
 import numpy as np

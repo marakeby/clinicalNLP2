@@ -1,6 +1,7 @@
 from keras.preprocessing.text import Tokenizer
 from keras.preprocessing import sequence
 import logging
+from keras.utils import pad_sequences
 
 class KerasTokenizer():
     def __init__(self, mode, vocab_size , pad_length):
@@ -18,7 +19,7 @@ class KerasTokenizer():
     def transform(self, x):
         if self.mode =='seq':
             ret= self.tokenizer.texts_to_sequences(x)
-            ret = sequence.pad_sequences(ret, maxlen=self.pad_length)
+            ret = pad_sequences(ret, maxlen=self.pad_length)
             print('seq keras tokenizer')
             # print (len(ret[0]))
             # print (ret[0])

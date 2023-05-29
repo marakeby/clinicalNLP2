@@ -33,6 +33,17 @@ def evalualte(y_test, y_pred, y_pred_score =None):
     # score['aupr'] = aupr
     return score
 
+
+import numpy as np
+def compute_metrics(p):    
+    pred, labels = p
+    pred = np.argmax(pred, axis=1)
+    accuracy = accuracy_score(y_true=labels, y_pred=pred)
+    recall = metrics.recall_score(y_true=labels, y_pred=pred)
+    precision = metrics.precision_score(y_true=labels, y_pred=pred)
+    f1 = metrics.f1_score(y_true=labels, y_pred=pred)    
+    return {"accuracy": accuracy, "precision": precision, "recall": recall, "f1": f1}
+
 if __name__ == "__main__":
     filename= sys.argv[1:]
     df = pd.read_csv(filename)

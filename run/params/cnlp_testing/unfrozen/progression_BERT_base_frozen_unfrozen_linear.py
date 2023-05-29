@@ -45,14 +45,14 @@ pre = dict(type= 'clean_text',
 
 fname = splitext(filename)[0]
 training_args_frozen = TrainingArguments(
-        output_dir=join('/home/haithamelmarakeby/testing/unfrozen/results/base_frozen',fname),  # output directory
+        output_dir=join('/home/jupyter/clinicalNLP2/base_frozen',fname),  # output directory
         num_train_epochs=3,  # total number of training epochs
         # per_device_train_batch_size=16,  # batch size per device during training
         per_device_train_batch_size=64,  # batch size per device during training
         per_device_eval_batch_size=64,  # batch size for evaluation
         warmup_steps=500,  # number of warmup steps for learning rate scheduler
         weight_decay=0.01,  # strength of weight decay
-        logging_dir=join('/home/haithamelmarakeby/testing/unfrozen/logs/base_frozen',fname),  # directory for storing logs
+        logging_dir=join('/home/jupyter/clinicalNLP2/base_frozen',fname),  # directory for storing logs
         logging_steps=10,
         save_steps= 100000000,
         save_total_limit= 1,
@@ -61,14 +61,14 @@ training_args_frozen = TrainingArguments(
 
 
 training_args_unfrozen = TrainingArguments(
-        output_dir=join('/home/haithamelmarakeby/testing/unfrozen/results/base_unfrozen',fname),  # output directory
+        output_dir=join('/home/jupyter/clinicalNLP2/base_unfrozen',fname),  # output directory
         num_train_epochs=3,  # total number of training epochs
         # per_device_train_batch_size=16,  # batch size per device during training
         per_device_train_batch_size=12,  # batch size per device during training
         per_device_eval_batch_size=12,  # batch size for evaluation
         warmup_steps=500,  # number of warmup steps for learning rate scheduler
         weight_decay=0.01,  # strength of weight decay
-        logging_dir=join('/home/haithamelmarakeby/testing/unfrozen/logs/base_unfrozen',fname),  # directory for storing logs
+        logging_dir=join('/home/jupyter/clinicalNLP2/base_unfrozen',fname),  # directory for storing logs
         logging_steps=10,
         save_steps= 100000000,
         save_total_limit= 1,

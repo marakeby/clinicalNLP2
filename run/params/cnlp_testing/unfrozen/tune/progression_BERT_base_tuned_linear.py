@@ -6,6 +6,7 @@ from os.path import join, splitext
 from model.torch_models.bert_cnn import CNN_Over_BERT
 from model.torch_models.bert_linear import Linear_Over_BERT
 from model.torch_models.bert_rnn import RNN_Over_BERT
+from config_path import LOG_PATH
 
 training_splits = [0,1,4,6,7,9]
 number_reports = [11182,7382,2897,1214, 865, 453 ]
@@ -45,14 +46,14 @@ pre = dict(type= 'clean_text',
 
 fname = splitext(filename)[0]
 training_args_untuned = TrainingArguments(
-        output_dir=join('/home/haithamelmarakeby/testing/unfrozen/results/base_untuned',fname),  # output directory
+        output_dir=join(LOG_PATH,f'tune/{fname}'),  # output directory
         num_train_epochs=3,  # total number of training epochs
         # per_device_train_batch_size=16,  # batch size per device during training
         per_device_train_batch_size=64,  # batch size per device during training
         per_device_eval_batch_size=64,  # batch size for evaluation
         warmup_steps=500,  # number of warmup steps for learning rate scheduler
         weight_decay=0.01,  # strength of weight decay
-        logging_dir=join('/home/haithamelmarakeby/testing/unfrozen/logs/base_untuned',fname),  # directory for storing logs
+        logging_dir=join(LOG_PATH,f'tune/{fname}'),  # directory for storing logs
         logging_steps=10,
         save_steps= 100000000,
         save_total_limit= 1,
@@ -61,14 +62,14 @@ training_args_untuned = TrainingArguments(
 
 
 training_args_tuned = TrainingArguments(
-        output_dir=join('/home/haithamelmarakeby/testing/unfrozen/results/base_tuned',fname),  # output directory
+        output_dir=join(LOG_PATH,f'tune/{fname}'),  # output directory
         num_train_epochs=3,  # total number of training epochs
         # per_device_train_batch_size=16,  # batch size per device during training
-        per_device_train_batch_size=12,  # batch size per device during training
-        per_device_eval_batch_size=12,  # batch size for evaluation
+        per_device_train_batch_size=32,  # batch size per device during training
+        per_device_eval_batch_size=32,  # batch size for evaluation
         warmup_steps=500,  # number of warmup steps for learning rate scheduler
         weight_decay=0.01,  # strength of weight decay
-        logging_dir=join('/home/haithamelmarakeby/testing/unfrozen/logs/base_tuned',fname),  # directory for storing logs
+        logging_dir=join(LOG_PATH,f'tune/{fname}'),  # directory for storing logs
         logging_steps=10,
         save_steps= 100000000,
         save_total_limit= 1,
@@ -85,8 +86,8 @@ mini_bert_model_name= 'google/bert_uncased_L-4_H-256_A-4'
 med_bert_model_name= 'google/bert_uncased_L-8_H-512_A-8'
 base_bert_model_name= 'google/bert_uncased_L-12_H-768_A-12'
 #pretrained (tuned)
-tiny_tuned = '/home/haithamelmarakeby/pretrained_models_truncated/tiny/train/model'
-base_tuned = '/home/haithamelmarakeby/pretrained_models_truncated/base/train/model'
+tiny_tuned = '/home/jupyter/pretrained_models/bert_tiny_tuned'
+base_tuned = '/home/jupyter/pretrained_models/bert_base_tuned'
 
 bert_model_name = base_bert_model_name
 
