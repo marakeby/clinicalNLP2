@@ -7,7 +7,7 @@ from torch import optim, nn
 from torch.utils.data import DataLoader
 import time
 import logging
-from barbar import Bar
+# from barbar import Bar
 
 
 

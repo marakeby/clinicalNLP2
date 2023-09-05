@@ -22,8 +22,8 @@ for i in training_splits:
 pre = {'type' : None}
 
 # mode = {'count', 'freq', 'tfidf', 'binary'}
-features = { 'type' : 'keras_tokenizer', 'params': {'mode': 'tfidf', 'vocab_size': vocab_size, 'pad_length': None}}
-# features = { 'type' : 'sk_tokenizer', 'params': {}}
+# features = { 'type' : 'keras_tokenizer', 'parmas': {'mode': 'tfidf', 'vocab_size': vocab_size, 'pad_length': None}}
+features = { 'type' : 'sk_tokenizer', 'params': {}}
 
 nn = {
     'type': 'nn',

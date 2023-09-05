@@ -43,6 +43,11 @@ class Bert_Torch_Model(BaseEstimator):
         self.compute_metrics = compute_metrics
         self.loss ='sigmoid'
 
+        logging.info('self.model_name ', self.bert_model_name )
+        bert= BertModel.from_pretrained(self.bert_model_name)
+        self.model = BertSequenceClassificationModel(bert, self.freez_bert, self.classifier, **self.classifier_params )
+
+
 
     def set_params(self, sk_params):
         self.params = sk_params
@@ -53,15 +58,9 @@ class Bert_Torch_Model(BaseEstimator):
 
     def fit(self, X_train, y_train, X_val=None, y_val=None):
         device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-        print('self.model_name ', self.bert_model_name )
-        bert= BertModel.from_pretrained(self.bert_model_name)
-        self.model = BertSequenceClassificationModel(bert, self.freez_bert, self.classifier, **self.classifier_params )
-        self.model.to(device)
-        def count_parameters(model):
-            return sum(p.numel() for p in model.parameters() if p.requires_grad)
 
-        trainable_parmas_no = count_parameters(self.model.bert )
-        logging.info('Trainable params no {}'.format(trainable_parmas_no))
+        self.model.to(device)
+
         train_dataset = get_dataset(X_train, y_train, type='torch')
         if X_val is not None:
             val_dataset = get_dataset(X_val, y_val, type='torch')
@@ -72,6 +71,20 @@ class Bert_Torch_Model(BaseEstimator):
         self.trainer.train()
         return self
 
+    def count_params(self):
+        def count_parameters(model, trainable):
+            if trainable:
+                ret = sum(p.numel() for p in model.parameters() if p.requires_grad)
+            else:
+                ret = sum(p.numel() for p in model.parameters())
+            return ret
+
+
+        trainable_parmas_no =  count_parameters(self.model.classifier, trainable=True)
+        total_parmas_no =  count_parameters(self.model.classifier, trainable=False)
+        logging.info('Trainable params {}'.format(trainable_parmas_no))
+        logging.info('Total params {}'.format(total_parmas_no))
+        return trainable_parmas_no, total_parmas_no
     def predict(self, X_test):
         prediction_scores = self.predict_proba(X_test)
         prediction=prediction_scores.argmax(axis=1)

@@ -160,9 +160,9 @@ To get a local copy up and running, follow these simple steps
    python generate_figures.py
    ```
    
-4. To generate individual paper figure run the different files under the 'paper_analysis' directory, e.g. 
+4. To generate individual paper figure run the different files under the 'paper_analysis_revision2' directory, e.g. 
      ```sh
-   cd ./paper_analysis
+   cd ./paper_analysis_revision2
    python figure_4_samples_sizes.py
    ```
      

@@ -52,6 +52,8 @@ def any_cancer_JAMA(vocab_size, embedding_dims, input_maxlen, hidden_dims, kerne
     model.add(Dense(1))
     model.add(Activation('sigmoid'))
     model.compile(loss='binary_crossentropy', optimizer=optimizer, metrics=['accuracy'])
+    logging.info('number of trainable parmas {}'.format(model.count_params()))
+    logging.info(model.summary())
     return model
 
 

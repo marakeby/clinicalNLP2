@@ -22,8 +22,8 @@ train_filename = 'train_text_imaging_only.txt'
 valid_filename = 'valid_text_imaging_only.txt'
 input_dir = 'gs://profile-notes/geekfest_files/unlabeled_data/'
 
-base_dir = '/home/haithamelmarakeby/pretrained_models_truncated_revision' #used save trained model, checkpoints, and logs
-# base_dir = 'gs://profile-notes/pretrained_models_trial'
+base_dir = '/home/haithamelmarakeby/pretrained_models_truncated' #used save trained model, checkpoints, and logs
+
 def truncate(x, n):
     ret = [x[0]] + x[-n:]
     return ret
@@ -52,7 +52,7 @@ class TorchDataset(torch.utils.data.Dataset):
     def __len__(self):
         return len(self.text)
 
-def run(bert_model_name='tiny', dataset = 'valid', max_len=512, small_sample=False):
+def run(bert_model_name='tiny', dataset = 'valid', max_len=512):
     sub_dir = join(base_dir, bert_model_name)
     model_name = models_dict[bert_model_name]
     bert_model = AutoModelForMaskedLM.from_pretrained(model_name)
@@ -60,10 +60,9 @@ def run(bert_model_name='tiny', dataset = 'valid', max_len=512, small_sample=Fal
     if dataset == 'valid':
         input_filename= valid_filename
         sub_dir = join(sub_dir, 'validation')
-    elif dataset=='train':
+    else:
         input_filename= train_filename
         sub_dir = join(sub_dir, 'train')
-
 
     output_dir = join(sub_dir, 'output')
     logging_dir = join(sub_dir, 'log')
@@ -72,9 +71,6 @@ def run(bert_model_name='tiny', dataset = 'valid', max_len=512, small_sample=Fal
     train_data =  pd.read_csv(join(input_dir,input_filename) )
     train_data = train_data[train_data.text.str.len() > 50]
 
-    eval_data =  pd.read_csv(join(input_dir,valid_filename) )
-    eval_data = eval_data[eval_data.text.str.len() > 50]
-    
     # tokenizer = AutoTokenizer.from_pretrained(model_name, truncation=True, padding=True, max_len=512)
     tokenizer = AutoTokenizer.from_pretrained(model_name, truncation=False, padding=True, max_len=max_len)
 
@@ -84,34 +80,16 @@ def run(bert_model_name='tiny', dataset = 'valid', max_len=512, small_sample=Fal
         tokenizer=tokenizer, mlm=True, mlm_probability=0.15
     )
 
-    per_device_train_batch_size = 8
 
-    if small_sample:
-        input_dataset = TorchDataset(train_data['text'].values[0:1000], tokenizer, max_length=max_len)
-        eval_dataset = TorchDataset(eval_data['text'].values[0:1000], tokenizer, max_length=max_len)
-        epoch_steps = round(1000/per_device_train_batch_size) #roughly 1 epoch
-    else:
-        input_dataset = TorchDataset(train_data['text'].values, tokenizer, max_length=max_len)
-        eval_dataset = TorchDataset(eval_data['text'].values, tokenizer, max_length=max_len)  
-        epoch_steps = round(train_data.shape[0]/per_device_train_batch_size) #roughly 1 epoch
-    
-    
-    
-    
-    
+    input_dataset = TorchDataset(train_data['text'].values, tokenizer, max_length=max_len)
+
     training_args = TrainingArguments(
         output_dir= output_dir,
         logging_dir =logging_dir,  
         overwrite_output_dir=True,
         num_train_epochs=10,
-        per_device_train_batch_size= per_device_train_batch_size,
-        save_steps = epoch_steps , 
-#         save_steps=40_000,
-        
-        do_eval = True,
-        evaluation_strategy='steps',
-        eval_steps = epoch_steps
-#         save_strategy = 'epoch'
+        per_device_train_batch_size=8,
+        save_steps=40_000,
 #         save_total_limit=2,
 #         max_steps=100
     )
@@ -121,8 +99,6 @@ def run(bert_model_name='tiny', dataset = 'valid', max_len=512, small_sample=Fal
         args=training_args,
         data_collator=data_collator,
         train_dataset=input_dataset,
-        
-        eval_dataset = eval_dataset
     #     prediction_loss_only=True,
     )
 
@@ -135,5 +111,4 @@ def run(bert_model_name='tiny', dataset = 'valid', max_len=512, small_sample=Fal
 
 if __name__=="__main__":
     #use validartion data only 
-#     run(bert_model_name='base', dataset = 'train', max_len=512)
-    run(bert_model_name='tiny', dataset = 'valid', max_len=512, small_sample=False)
+    run(bert_model_name='base', dataset = 'train', max_len=512)

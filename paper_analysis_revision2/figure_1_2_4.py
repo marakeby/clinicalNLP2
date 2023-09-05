@@ -8,6 +8,7 @@ from matplotlib import pyplot as plt
 import os
 
 from paper_analysis_revision2.data_utils import filter_model_dirs, read_predictions
+from paper_analysis_revision2.plot_utils import model_colors
 from utils.stat_utils import score_ci
 from config_path import  PLOTS_PATH
 import numpy as np

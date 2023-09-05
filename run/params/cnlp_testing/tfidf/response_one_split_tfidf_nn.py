@@ -4,7 +4,7 @@ filename = os.path.basename(__file__)
 from copy import copy, deepcopy
 
 vocab_size = 20000
-data_base ={'id':'progression','type': 'updated_label' , 'params': {'outcome': 'progression', 'text': 'NARR+IMPRESS', 'training_split':0}}
+data_base ={'id':'response','type': 'updated_label' , 'params': {'outcome': 'progression', 'text': 'NARR+IMPRESS', 'training_split':0}}
 
 training_splits = [0,1,4,6,7,9]
 number_reports = [11182,7382,2897,1214, 865, 453 ]
@@ -22,8 +22,8 @@ for i in training_splits:
 pre = {'type' : None}
 
 # mode = {'count', 'freq', 'tfidf', 'binary'}
-features = { 'type' : 'keras_tokenizer', 'params': {'mode': 'tfidf', 'vocab_size': vocab_size, 'pad_length': None}}
-# features = { 'type' : 'sk_tokenizer', 'params': {}}
+# features = { 'type' : 'keras_tokenizer', 'parmas': {'mode': 'tfidf', 'vocab_size': vocab_size, 'pad_length': None}}
+features = { 'type' : 'sk_tokenizer', 'params': {}}
 
 nn = {
     'type': 'nn',
